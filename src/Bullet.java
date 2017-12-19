@@ -1,15 +1,19 @@
+import Util.Audio;
+
 import java.awt.*;
 import java.util.Vector;
 
 public class Bullet implements Runnable {
+    // 定义子弹的尺寸
+    private static final int bulletwidth = 12;
+    private static final int bulletheight = 12;
+    // 定义一个子弹集合
+    private static Vector<Bullet> bullets = new Vector<>();
     // 定义每一颗子弹的伤害值
     public static int damage = 25;
-    // 定义子弹的尺寸
-    static int bulletwidth = 12;
-    static int bulletheight = 12;
     // 子弹图片初始化
     // 定义为全局静态变量
-    private static Image[] BulletImages = null;
+    private static Image[] BulletImages;
 
     static {
         BulletImages = new Image[]{
@@ -26,18 +30,12 @@ public class Bullet implements Runnable {
     // 定义坐标
     int x;
     int y;
-    // 定义爆炸集合
-    Bomb bomb = null;
-    Vector<Bomb> bombs = new Vector<>();
-    // 定义子弹的速度
-    int speed = 16;
     // 定义子弹的存在状态
     boolean isLive = true;
     // 定义方向
     int direct = 0;
-    // 定义一个子弹集合
-    Vector<Bullet> bullets = new Vector<>();
-    Graphics g = null;
+    // 定义子弹的速度
+    private int speed = 16;
 
     // 构造函数
     public Bullet(int x, int y, int direct) {
@@ -72,10 +70,10 @@ public class Bullet implements Runnable {
                 bullet.isLive = false;
                 CWall.isLive = false;
                 GamePanel.CWalls.remove(CWall);
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     // 判断怪物和我的子弹与石墙相遇的时候--子弹消失
@@ -84,10 +82,10 @@ public class Bullet implements Runnable {
             BlockWall BWall = GamePanel.BWalls_1.get(i);
             if (BWall.getRect().intersects(bullet.bulletgetRect())) {
                 bullet.isLive = false;
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     // 判断我的坦克的子弹和怪物的子弹相遇的情况，子弹相遇后抵消，都消失

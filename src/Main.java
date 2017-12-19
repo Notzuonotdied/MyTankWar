@@ -1,3 +1,5 @@
+import Util.CommonUtil;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -5,8 +7,7 @@ public class Main {
         // 实例化
         MainFrame mainFrame = new MainFrame();
         // 启动线程
-        Thread t = new Thread(mainFrame::start);
-        t.start();
+        CommonUtil.getInstance().startThread(mainFrame::run);
     }
 
 }

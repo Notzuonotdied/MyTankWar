@@ -1,18 +1,25 @@
+package Util;
+
 import javax.sound.sampled.*;
+import java.net.URL;
 
-//播放声音的类
-class Audio extends Thread {
-    java.net.URL path = null;
-    private String filename;
+/**
+ * 播放声音的类
+ */
+public class Audio {
+    private URL path;
 
-    public Audio(String wavfile) {
-        filename = wavfile;
-        path = getClass().getResource("/Sound/" + filename);
+    public Audio(String wavFile) {
+        path = getClass().getResource("/Sound/" + wavFile);
     }
 
-    public void run() {
+    public void start() {
+        CommonUtil.getInstance().startThread(this::run);
+    }
 
-        AudioInputStream audioInputStream = null;
+    private void run() {
+
+        AudioInputStream audioInputStream;
         try {
             audioInputStream = AudioSystem.getAudioInputStream(path);
         } catch (Exception e1) {
@@ -22,7 +29,7 @@ class Audio extends Thread {
         }
 
         AudioFormat format = audioInputStream.getFormat();
-        SourceDataLine auline = null;
+        SourceDataLine auline;
         DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
 
         try {

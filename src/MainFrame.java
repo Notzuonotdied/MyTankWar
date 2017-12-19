@@ -1,3 +1,5 @@
+import Util.Audio;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -158,7 +160,7 @@ public class MainFrame extends JFrame implements ActionListener {
             case "start": {
                 GamePanel.monster.clear();
 
-                GamePanel.monstersize = 6;
+                GamePanel.monsterSize = 6;
                 Monster.bulletsize = 2;
                 GamePanel.level = 0;
 
@@ -172,6 +174,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 // 启动声音
                 Audio audio = new Audio("bgm.wav");
                 audio.start();
+
                 // 删除旧的面板
                 this.remove(gamestartpanel);
                 this.add(gamepanel);
@@ -188,7 +191,7 @@ public class MainFrame extends JFrame implements ActionListener {
                     GamePanel.monster.clear();
                     GamePanel.CWalls.clear();
 
-                    GamePanel.monstersize = 8;
+                    GamePanel.monsterSize = 8;
                     GamePanel.level = 1;
                     Monster.bulletsize = 3;
                     gamepanel = new GamePanel(0);
@@ -201,7 +204,7 @@ public class MainFrame extends JFrame implements ActionListener {
                     GamePanel.monster.clear();
                     GamePanel.CWalls.clear();
 
-                    GamePanel.monstersize = 9;
+                    GamePanel.monsterSize = 9;
                     GamePanel.level = 2;
                     Monster.bulletsize = 4;
                     gamepanel = new GamePanel(0);
@@ -214,7 +217,7 @@ public class MainFrame extends JFrame implements ActionListener {
                     GamePanel.monster.clear();
                     GamePanel.CWalls.clear();
 
-                    GamePanel.monstersize = 10;
+                    GamePanel.monsterSize = 10;
                     Monster.bulletsize = 5;
                     GamePanel.level = 3;
                     gamepanel = new GamePanel(0);
@@ -232,7 +235,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 break;
             case "exit": {
                 Object[] options = {"不玩了！", "继续玩！"};
-                int response = showChoiceStyleDialog(options, "是否", "退出游戏?");
+                int response = showChoiceStyleDialog(options, "退出游戏?");
                 if (response == 0) {
                     // 正常退出程序
                     System.exit(0);
@@ -241,7 +244,7 @@ public class MainFrame extends JFrame implements ActionListener {
             }
             case "savebeforeexit": {
                 Object[] options = {"保存并退出", "继续玩游戏"};
-                int response = showChoiceStyleDialog(options, "是否", "存盘并退出游戏？");
+                int response = showChoiceStyleDialog(options, "存盘并退出游戏？");
                 if (response == 0) {
 
                     // 保存我的坦克的信息和怪物的信息
@@ -269,7 +272,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 this.remove(gamestartpanel);
                 if (GamePanel.button) {
                     Object[] options = {"恢复游戏", "继续游戏"};
-                    int response = showChoiceStyleDialog(options, "是否",
+                    int response = showChoiceStyleDialog(options,
                             "恢复保存的游戏并放弃本次游戏？");
                     if (response == 0) {
                         this.remove(gamepanel);
@@ -303,10 +306,16 @@ public class MainFrame extends JFrame implements ActionListener {
                 options, options[0]);
     }
 
-    public void start() {
-        if (GamePanel.buttonwin || GamePanel.buttonfail) {
+    public void run() {
+        while (true) {
+            this.start();
+        }
+    }
+
+    private void start() {
+        if (GamePanel.buttonWin || GamePanel.buttonFail) {
             try {
-                if (GamePanel.buttonwin) {
+                if (GamePanel.buttonWin) {
                     Object[] options = {"确定", "取消"};
                     int response = showChoiceDialog(options, "是否继续闯关");
                     if (response == 0) {
@@ -314,28 +323,28 @@ public class MainFrame extends JFrame implements ActionListener {
                         GamePanel.CWalls.clear();
 
                         if (GamePanel.level == 0) {
-                            GamePanel.monstersize = 8;
+                            GamePanel.monsterSize = 8;
                             Monster.bulletsize = 3;
                             GamePanel.level = 1;
                             gamepanel = new GamePanel(0);
 
                         } else if (GamePanel.level == 1) {
-                            GamePanel.monstersize = 9;
+                            GamePanel.monsterSize = 9;
                             Monster.bulletsize = 4;
                             GamePanel.level = 2;
                             gamepanel = new GamePanel(0);
 
                         } else if (GamePanel.level == 2) {
-                            GamePanel.monstersize = 10;
+                            GamePanel.monsterSize = 10;
 
                             Monster.bulletsize = 10;
                             GamePanel.level = 3;
                             gamepanel = new GamePanel(0);
                         }
                     }
-                    GamePanel.buttonwin = false;
+                    GamePanel.buttonWin = false;
                 }
-                if (GamePanel.buttonfail) {
+                if (GamePanel.buttonFail) {
                     Object[] options = {"确定", "取消"};
                     int response = showChoiceDialog(options, "是否继续游戏");
                     if (response == 0) {
@@ -343,24 +352,24 @@ public class MainFrame extends JFrame implements ActionListener {
                         GamePanel.CWalls.clear();
 
                         if (GamePanel.level == 0) {
-                            GamePanel.monstersize = 6;
+                            GamePanel.monsterSize = 6;
                             Monster.bulletsize = 2;
                             gamepanel = new GamePanel(0);
                         } else if (GamePanel.level == 1) {
-                            GamePanel.monstersize = 8;
+                            GamePanel.monsterSize = 8;
                             Monster.bulletsize = 3;
                             gamepanel = new GamePanel(0);
                         } else if (GamePanel.level == 2) {
-                            GamePanel.monstersize = 9;
+                            GamePanel.monsterSize = 9;
                             Monster.bulletsize = 4;
                             gamepanel = new GamePanel(0);
                         } else if (GamePanel.level == 3) {
-                            GamePanel.monstersize = 10;
+                            GamePanel.monsterSize = 10;
                             Monster.bulletsize = 10;
                             gamepanel = new GamePanel(0);
                         }
                     }
-                    GamePanel.buttonfail = false;
+                    GamePanel.buttonFail = false;
                 }
 
                 Thread.sleep(1500);
@@ -375,7 +384,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 if (GameStartPanel.button1) {
                     GamePanel.monster.clear();
 
-                    GamePanel.monstersize = 6;
+                    GamePanel.monsterSize = 6;
                     Monster.bulletsize = 2;
 
                     gamepanel = new GamePanel(0);
@@ -393,9 +402,7 @@ public class MainFrame extends JFrame implements ActionListener {
                     this.add(gamepanel);
                     // 监听
                     this.addKeyListener(gamepanel);
-
                     this.setVisible(true);
-
                     this.button = true;
                 }
                 // 继续游戏
@@ -404,14 +411,8 @@ public class MainFrame extends JFrame implements ActionListener {
                     this.remove(gamestartpanel);
                     if (GamePanel.button) {
                         Object[] options = {"恢复游戏", "继续游戏"};
-                        int response = JOptionPane
-                                .showOptionDialog(
-                                        this,
-                                        new JLabel(
-                                                "<html><h2><font color='red'>是否</font>恢复保存的游戏并放弃本次游戏？</h2></html>"),
-                                        "", JOptionPane.YES_NO_OPTION,
-                                        JOptionPane.QUESTION_MESSAGE, null,
-                                        options, options[0]);
+                        int response = showChoiceStyleDialog(options,
+                                "恢复保存的游戏并放弃本次游戏?");
                         if (response == 0) {
                             this.remove(gamepanel);
                             // 清除原先储存在vector中的数据，防止多余的数据影响恢复体验
@@ -446,9 +447,9 @@ public class MainFrame extends JFrame implements ActionListener {
                 options[0]);
     }
 
-    private int showChoiceStyleDialog(Object[] options, String redMessage, String message) {
+    private int showChoiceStyleDialog(Object[] options, String message) {
         return JOptionPane.showOptionDialog(this,
-                "<html><h2><font color='red'>" + redMessage + "</font>" + message + "</h2></html>",
+                "<html><h2><font color='red'>是否</font>" + message + "</h2></html>",
                 "", JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null, options,
                 options[0]);

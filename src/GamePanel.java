@@ -1,3 +1,5 @@
+import Util.Audio;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -10,18 +12,16 @@ import java.util.Vector;
 @SuppressWarnings("serial")
 // 游戏面板
 class GamePanel extends JPanel implements KeyListener, Runnable {
-    // 总成绩
-    public static int score = 0;
+    // 定义我的坦克可以连发的子弹数
+    private static final int buttleNumber = 2;
     // 设置关卡
     public static int level = 0;
     // 定义怪物的数量
-    public static int monstersize = 6;
+    public static int monsterSize = 6;
     // 控制界面是否移除的变量
     public static boolean button = false;
-    // 控制是否在我的坦克死亡后继续游戏的变量
-    public static boolean choice = false;
-    public static boolean buttonwin = false;
-    public static boolean buttonfail = false;
+    public static boolean buttonWin = false;
+    public static boolean buttonFail = false;
     // 定义我的坦克类
     static MyTank myTank = null;
     // 定义一个敌人的坦克集合
@@ -32,35 +32,34 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
     static Vector<CommentWall> CWalls = new Vector<>();
     // 定义一个石墙集合----这是内部的石墙
     static Vector<BlockWall> BWalls_1 = new Vector<>();
-    // 定义我的坦克可以连发的子弹数
-    int buttlenumber = 2;
-    // 定义一个普通墙集合
-    CommentWall CWall = null;
-    Vector<BlockWall> BWalls = new Vector<>();
+    // 总成绩
+    private static int score = 0;
+    // 控制是否在我的坦克死亡后继续游戏的变量
+    private static boolean choice = false;
     // 定义一个树木集合
     Tree tr = null;
-    Vector<Tree> tree = new Vector<>();
-    // 用于判断记录文件是否为空
-    FileInputStream fin = null;
-    // 定义随机变量
-    private Random r = new Random();
-    private int movesteps = 0;
+    private Vector<BlockWall> BWalls = new Vector<>();
+    private Vector<Tree> tree = new Vector<>();
 
     // GamePanel构造函数
-    public GamePanel(int flag) {
+    GamePanel(int flag) {
         int size = 0;
         // 判断记录的文本是否为空
         try {
             // 判读文本是否存在，不存在就新建一个空白文本
             File f = new File("myrecoder.txt");
             if (f.exists()) {
-                fin = new FileInputStream("myrecoder.txt");
+                FileInputStream fin = new FileInputStream("myrecoder.txt");
                 // 获取
                 size = fin.available();
                 // 已经不需要判断了，关闭流
                 fin.close();
             } else {
-                f.createNewFile();
+                if (f.createNewFile()) {
+                    System.out.println("文件创建成功！");
+                } else {
+                    System.out.println("文件创建失败！");
+                }
             }
 
             if (size != 0 && flag == 1) {
@@ -72,11 +71,12 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
                 myTank = new MyTank(600, 500);
                 myTank.setDirect(0);
                 // 创建怪物的坦克
-                for (int i = 0; i < GamePanel.monstersize; i++) {
+                for (int i = 0; i < GamePanel.monsterSize; i++) {
                     // 定义坦克的位置
-                    movesteps = r.nextInt(30) + 35;
-                    Monster mon = new Monster((i + 1) * 80, movesteps);
-                    Monster.setTankNumber(monstersize);
+                    Random r = new Random();
+                    int moveSteps = r.nextInt(30) + 35;
+                    Monster mon = new Monster((i + 1) * 80, moveSteps);
+                    Monster.setTankNumber(monsterSize);
                     mon.setDirect(2);
                     // 启动敌人坦克
                     Thread mont = new Thread(mon);
@@ -125,7 +125,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
     }
 
     // 初始化普通墙
-    public void DrawCWall() {
+    private void DrawCWall() {
         // 初始化普通墙
         for (int i = 0; i < 15; i++) {
             if (i < 12) {
@@ -153,7 +153,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
     }
 
     // 画出我的坦克
-    public void DrawMyTank(Graphics g) {
+    private void DrawMyTank(Graphics g) {
         // 画出我自己的坦克
         if (myTank.isLive) {
             myTank.drawTank(myTank.x, myTank.y, g, 0);
@@ -163,17 +163,17 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         // 画出子弹
         for (int i = 0; i < myTank.bullets.size(); i++) {
             Bullet bullet = myTank.bullets.get(i);
-            if (bullet != null && bullet.isLive == true
-                    && myTank.isLive == true
-                    && !bullet.BulletComeAcrossCWall(bullet)
+            if (bullet != null && bullet.isLive && myTank.isLive
+                    && bullet.BulletComeAcrossCWall(bullet)
                     && !bullet.BulletComeAcrossMonster(bullet)
-                    && !bullet.BulletComeAcrossBWall(bullet)) {
+                    && bullet.BulletComeAcrossBWall(bullet)) {
                 // 画出子弹的轨迹
                 bullet.drawBullet(g);
                 // 判断是否集中了怪物
                 bullet.HitMonster();
             }
-            if (bullet.isLive == false) {
+            assert bullet != null;
+            if (!bullet.isLive) {
                 // 如果子弹存在状态为假就移除子弹
                 myTank.bullets.remove(bullet);
             }
@@ -181,7 +181,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
     }
 
     // 画出怪物
-    public void DrawMonster(Graphics g) {
+    private void DrawMonster(Graphics g) {
         for (int i = 0; i < monster.size(); i++) {
             Monster mon = monster.get(i);
             if (mon.isLive) {
@@ -190,28 +190,30 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
                 for (int j = 0; j < mon.bullets.size(); j++) {
                     // 取出一个子弹
                     Bullet bullet = mon.bullets.get(j);
-                    if (bullet.isLive && !bullet.BulletComeAcrossCWall(bullet)
-                            && !bullet.BulletComeAcrossBWall(bullet)) {
+                    if (bullet.isLive && bullet.BulletComeAcrossCWall(bullet)
+                            && bullet.BulletComeAcrossBWall(bullet)) {
                         // 画出子弹的轨迹
                         bullet.drawBullet(g);
                         // 判断是否击中了我的坦克
                         bullet.HitMyTank();
                     }
-                    if (bullet.isLive == false) {
+                    if (!bullet.isLive) {
                         mon.bullets.remove(bullet);
                     }
                 }
             }
             // 怪物死亡就移除
-            if (mon.isLive == false) {
+            if (!mon.isLive) {
                 monster.remove(mon);
                 GamePanel.score++;
             }
         }
     }
 
-    // 画出墙,爆炸效果，树木，普通墙
-    public void DrawItem(Graphics g) {
+    /**
+     * 画出墙,爆炸效果，树木，普通墙
+     */
+    private void DrawItem(Graphics g) {
         // 画出爆炸效果
         for (int i = 0; i < GamePanel.bombs.size(); i++) {
             bomb = GamePanel.bombs.get(i);
@@ -224,19 +226,18 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
 
         // 画出普通墙
         for (int i = 0; i < GamePanel.CWalls.size(); i++) {
-            CWall = GamePanel.CWalls.get(i);
+            CommentWall cWall = GamePanel.CWalls.get(i);
             // 如果普通墙存在状态为真就画出来
-            if (CWall.isLive) {
-                CWall.drawCWall(g);
+            if (cWall.isLive) {
+                cWall.drawCWall(g);
             } else {
-                GamePanel.CWalls.remove(CWall);
+                GamePanel.CWalls.remove(cWall);
             }
         }
 
-        // 画出石墙
-        // 外围石墙
-        for (int i = 0; i < this.BWalls.size(); i++) {
-            this.BWalls.get(i).drawBWall(g);
+        // 画出外围石墙
+        for (BlockWall BWall : this.BWalls) {
+            BWall.drawBWall(g);
         }
         // 内部石墙
         for (int i = 0; i < GamePanel.BWalls_1.size(); i++) {
@@ -244,13 +245,13 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         }
 
         // 画出树木
-        for (int i = 0; i < this.tree.size(); i++) {
-            this.tree.get(i).drawTree(g);
+        for (Tree aTree : this.tree) {
+            aTree.drawTree(g);
         }
     }
 
     // 信息显示
-    public void DrawInfo(Graphics g) {
+    private void DrawInfo(Graphics g) {
         // 左上角文字
         g.setColor(Color.black);
         g.setFont(new Font("楷体", Font.BOLD, 18));
@@ -272,24 +273,24 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
             g.drawString("You are Winner！ ", 175, 310);
             g.setFont(f);
             // 选择方案
-            GamePanel.buttonwin = true;
+            GamePanel.buttonWin = true;
             if (level == 3) {
                 g.drawString("You are Crazy！ ", 175, 370);
             }
         }
-        if (myTank.isLive == false) {
+        if (!myTank.isLive) {
             Font f = g.getFont();
             g.setFont(new Font("TimesRoman", Font.BOLD, 60)); // 判断是否赢得比赛--输了
             g.drawString("You are lost！ ", 180, 310);
             g.setFont(f);
             // 选择方案
 
-            GamePanel.buttonfail = true;
+            GamePanel.buttonFail = true;
         }
     }
 
     // 初始化工作
-    public void Initialization() {
+    private void Initialization() {
         // 初始化除了普通墙外的所有墙体--注：其他的墙体都设置为无敌了，不可攻击
         // 初始化石墙-外部围墙
         for (int i = 0; i < 23; i++) {
@@ -347,7 +348,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         }
         // 初始化草丛
         for (int i = 0; i < 5; i++) {
-            tree.add(new Tree(Tree.Treewidth * 1, Tree.Treeheight * (5 + i)));
+            tree.add(new Tree(Tree.Treewidth, Tree.Treeheight * (5 + i)));
             tree.add(new Tree(Tree.Treewidth * 2, Tree.Treeheight * (5 + i)));
             tree.add(new Tree(Tree.Treewidth * 19, Tree.Treeheight * (5 + i)));
             tree.add(new Tree(Tree.Treewidth * 20, Tree.Treeheight * (5 + i)));
@@ -380,7 +381,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         }
 
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            if (myTank.bullets.size() < buttlenumber) {
+            if (myTank.bullets.size() < buttleNumber) {
                 myTank.ShotEnemy();
             }
         }
@@ -403,97 +404,5 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
             this.repaint();
         }
     }
-}
-
-@SuppressWarnings("serial")
-// 开始面板
-class GameStartPanel extends JPanel implements KeyListener {
-
-    // 返回值
-    public static boolean button0 = false;
-    public static boolean button1 = false;
-    // 图片类
-    public int flag = 1;
-    // 初始化图片坦克的图片
-    Image[] tankImages = new Image[]{
-            Toolkit.getDefaultToolkit().getImage(
-                    TankMember.class.getResource("/images/1.gif")),
-
-            Toolkit.getDefaultToolkit().getImage(
-                    TankMember.class.getResource("/images/m0.gif")),};
-    // 设置开始游戏继续游戏的位置
-    private int Infox = 320;
-    private int Infoy = 400;
-    private int x = Infox - TankMember.size / 2 * 3 - 8;
-    private int y = Infoy - 30;
-
-    public void paint(Graphics g) {
-        super.paint(g);
-        // 画出信息代码部分
-        DrawInfo(g);
-    }
-
-    // 画出信息
-    public void DrawInfo(Graphics g) {
-
-        g.fillRect(0, 0, MainFrame.screenwidth + 10, MainFrame.screenheight);
-        // 提示信息
-
-        g.setColor(Color.YELLOW);
-        // 开关信息的字体
-        Font myfont1 = new Font("楷体", Font.BOLD, 60);
-        g.setFont(myfont1);
-        g.drawString("坦克大战-无聊版", 180, 310);
-        g.setColor(Color.RED);
-        g.drawString("坦克大战-无聊版", 176, 315);
-
-        g.setColor(Color.GRAY);
-        Font myfont = new Font("楷体", Font.BOLD, 30);
-        g.setFont(myfont);
-
-        g.drawString("开始游戏", Infox, Infoy);
-        g.drawString("继续游戏", Infox, Infoy + 40);
-        // 画出坦克
-        g.drawImage(tankImages[this.flag], this.x, this.y, null);
-        this.repaint();
-
-    }
-
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    public void keyPressed(KeyEvent e) {
-
-        if (e.getKeyCode() == KeyEvent.VK_DOWN
-                || e.getKeyCode() == KeyEvent.VK_UP) {
-            if (flag == 1) {
-                this.x = Infox - TankMember.size / 2 * 3;
-                this.y = Infoy + 15;
-                this.flag = 0;
-            } else {
-                this.x = Infox - TankMember.size / 2 * 3 - 8;
-                this.y = Infoy - 30;
-                this.flag = 1;
-            }
-            this.repaint();
-        }
-        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            if (this.flag == 0) {
-                GameStartPanel.button0 = true;
-            } else {
-                GameStartPanel.button1 = true;
-            }
-
-            // 启动声音
-            Audio audio = new Audio("StartGamePanel.wav");
-            audio.start();
-        }
-    }
-
-    public void keyReleased(KeyEvent e) {
-
-    }
-
 }
 
