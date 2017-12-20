@@ -1,3 +1,7 @@
+import UIElement.CommonWall;
+import Util.CommonUtil;
+import Util.Direction;
+
 import java.io.*;
 
 public class Recorder {
@@ -6,27 +10,28 @@ public class Recorder {
     private static BufferedWriter bw = null;
     private static FileReader fr = null;
     private static BufferedReader br = null;
-    // 临时起保存作用的字符串
-    private static String bulletscoordinate = "";
-    // 临时变量
-    private static Monster mon = null;
-    private static CommentWall cwall = null;
+    private static CommonWall cWall = null;
+    private String fileName = "myRecorder.txt";
+
+    public String getFileName() {
+        return fileName;
+    }
 
     public void SaveCWallInfo() {
         try {
             // 创建
-            fw = new FileWriter("myrecoder.txt", true);
+            fw = new FileWriter(fileName, true);
             bw = new BufferedWriter(fw);
 
             // 保存所有活着的怪物的坐标和方向
             for (int i = 0; i < GamePanel.CWalls.size(); i++) {
-                cwall = GamePanel.CWalls.get(i);
-                if (cwall.isLive) {
+                cWall = GamePanel.CWalls.get(i);
+                if (cWall.isLive) {
                     // 把活的怪物的数据读取出来
-                    String recoder = cwall.x + " " + cwall.y;
+                    String recorder = cWall.getX() + " " + cWall.getY();
                     // 把活的怪物的数据写入到文本中
                     // 2作为标识符，作为普通墙的标识符
-                    bw.write("2" + " " + recoder + "\r\n");
+                    bw.write("2" + " " + recorder + "\r\n");
                 }
             }
         } catch (Exception e) {
@@ -47,27 +52,12 @@ public class Recorder {
     public void SaveMyTankInfo() {
         try {
             // 创建
-            fw = new FileWriter("myrecoder.txt", true);
+            fw = new FileWriter(fileName, true);
             bw = new BufferedWriter(fw);
-            bulletscoordinate = "";
 
             // 保存我的坦克的坐标和方向
-            if (GamePanel.myTank.isLive == true) {
-                for (int i = 0; i < GamePanel.myTank.bullets.size(); i++) {
-                    Bullet bullet = GamePanel.myTank.bullets.get(i);
-                    if (bullet.isLive == true) {
-                        // 如果子弹的存在状态是真的话，就保存子弹的数据累加到字符串中
-                        bulletscoordinate += bullet.x + " " + bullet.y + " "
-                                + bullet.direct + " ";
-                    }
-                }
-                // 把我的坦克的数据读取出来
-                String recoder = GamePanel.myTank.x + " " + GamePanel.myTank.y
-                        + " " + GamePanel.myTank.direct + " "
-                        + bulletscoordinate;
-                // 把我的坦克的数据写入到文本中
-                // 0作为标识符，来区分我的坦克和怪物的数据
-                bw.write("0" + " " + recoder + "\r\n");
+            if (GamePanel.myTank.isLive) {
+                backupData(GamePanel.myTank);
             }
         } catch (Exception e) {
             // 将错误输出
@@ -87,29 +77,13 @@ public class Recorder {
     public void SaveMonsterInfo() {
         try {
             // 创建
-            fw = new FileWriter("myrecoder.txt");
+            fw = new FileWriter(fileName);
             bw = new BufferedWriter(fw);
-
             // 保存所有活着的怪物的坐标和方向
             for (int i = 0; i < GamePanel.monster.size(); i++) {
                 Monster mon = GamePanel.monster.get(i);
-                if (mon.isLive == true) {
-                    for (int j = 0; j < mon.bullets.size(); j++) {
-                        Bullet bullet = mon.bullets.get(j);
-                        if (bullet.isLive == true) {
-                            // 如果子弹的存在状态是真的话，就保存子弹的数据累加到字符串中
-                            bulletscoordinate += bullet.x + " " + bullet.y
-                                    + " " + bullet.direct + " ";
-                        }
-                    }
-                    // 把活的怪物的数据读取出来
-                    String recoder = mon.x + " " + mon.y + " " + mon.direct
-                            + " " + bulletscoordinate;
-                    // 把活的怪物的数据写入到文本中
-                    // 1作为标识符，来区分我的坦克和怪物的数据
-                    bw.write("1" + " " + recoder + "\r\n");
-                    // 清空字符串
-                    bulletscoordinate = "";
+                if (mon.isLive) {
+                    backupData(mon);
                 }
             }
         } catch (Exception e) {
@@ -127,21 +101,47 @@ public class Recorder {
         }
     }
 
-    // 从记录文本文件中恢复数据
-    // 原理：将数据从文本中一行行读取出来后对游戏面板中的怪物集合和我的坦克进行初始化
-    // 也就是说省略了实例化创建我的坦克和怪物坦克的过程。
+    private void backupData(TankMember tankMember) {
+        StringBuilder sb = new StringBuilder();
+        // 把我的坦克的数据读取出来
+        sb.append(tankMember.x).append(" ").append(tankMember.y).append(" ")
+                .append(tankMember.direct).append(" ");
+        for (int i = 0; i < tankMember.bullets.size(); i++) {
+            Bullet bullet = tankMember.bullets.get(i);
+            if (bullet.isLive) {
+                // 如果子弹的存在状态是真的话，就保存子弹的数据累加到字符串中
+                sb.append(bullet.x).append(" ").append(bullet.y).append(" ").append(bullet.direct).append(" ");
+            }
+        }
+
+        // 把坦克的数据写入到文本中
+        // 0作为标识符，表示我的坦克的数据
+        // 1作为标识符，表示怪物的数据
+        try {
+            bw.write("0" + " " + sb.toString() + "\r\n");
+        } catch (Exception e) {
+            // 将错误输出
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 从记录文本文件中恢复数据
+     * 原理：将数据从文本中一行行读取出来后对游戏面板中的怪物集合和我的坦克进行初始化
+     * 也就是说省略了实例化创建我的坦克和怪物坦克的过程。
+     */
     public void ReInfo() {
         try {
-            fr = new FileReader("myrecoder.txt");
+            fr = new FileReader(fileName);
             br = new BufferedReader(fr);
-            String Info = "";
+            String Info;
 
-            Bullet bullet = null;
+            Bullet bullet;
 
             // 临时变量
-            int tempx = 0;
-            int tempy = 0;
-            int tempd = 0;
+            int tempX;
+            int tempY;
+            int tempD;
 
             while ((Info = br.readLine()) != null) {
 
@@ -152,13 +152,13 @@ public class Recorder {
                 // 如果第一个标识符是1，数据就是怪物的
                 if (n == 1) {
                     // 类型转换
-                    tempx = Integer.parseInt(RecoveryInfo[1]);
-                    tempy = Integer.parseInt(RecoveryInfo[2]);
-                    tempd = Integer.parseInt(RecoveryInfo[3]);
+                    tempX = Integer.parseInt(RecoveryInfo[1]);
+                    tempY = Integer.parseInt(RecoveryInfo[2]);
+                    tempD = Integer.parseInt(RecoveryInfo[3]);
 
                     // 恢复并进行初始化
-                    mon = new Monster(tempx, tempy);
-                    mon.direct = tempd;
+                    Monster mon = new Monster(tempX, tempY);
+                    mon.direct = getDirection(tempD);
                     mon.isLive = true;
                     GamePanel.monster.add(mon);
                     // 启动敌人坦克
@@ -171,20 +171,19 @@ public class Recorder {
                         for (int i = 0; i < num; i++) {
                             if (i < num) {
                                 // 类型转换
-                                tempx = Integer
+                                tempX = Integer
                                         .parseInt(RecoveryInfo[3 * i + 4]);
-                                tempy = Integer
+                                tempY = Integer
                                         .parseInt(RecoveryInfo[3 * i + 5]);
-                                tempd = Integer
+                                tempD = Integer
                                         .parseInt(RecoveryInfo[3 * i + 6]);
 
                                 // 恢复并进行初始化
-                                bullet = new Bullet(tempx, tempy, tempd);
+                                bullet = new Bullet(tempX, tempY, getDirection(tempD));
                                 mon.bullets.add(bullet);
 
                                 // 启动子弹线程
-                                Thread t = new Thread(bullet);
-                                t.start();
+                                CommonUtil.getInstance().startCachedThread(bullet);
                             }
                         }
                     }
@@ -193,13 +192,13 @@ public class Recorder {
                 // 如果第一个标识符是0，数据就是我的坦克的
                 if (n == 0) {
                     // 类型转换
-                    tempx = Integer.parseInt(RecoveryInfo[1]);
-                    tempy = Integer.parseInt(RecoveryInfo[2]);
-                    tempd = Integer.parseInt(RecoveryInfo[3]);
+                    tempX = Integer.parseInt(RecoveryInfo[1]);
+                    tempY = Integer.parseInt(RecoveryInfo[2]);
+                    tempD = Integer.parseInt(RecoveryInfo[3]);
 
                     // 恢复并进行初始化
-                    GamePanel.myTank = new MyTank(tempx, tempy);
-                    GamePanel.myTank.direct = tempd;
+                    GamePanel.myTank = new MyTank(tempX, tempY);
+                    GamePanel.myTank.direct = getDirection(tempD);
                     GamePanel.myTank.isLive = true;
 
                     // 子弹的数据
@@ -208,15 +207,15 @@ public class Recorder {
                         for (int i = 0; i < num; i++) {
                             if (i < num) {
                                 // 类型转换
-                                tempx = Integer
+                                tempX = Integer
                                         .parseInt(RecoveryInfo[3 * i + 4]);
-                                tempy = Integer
+                                tempY = Integer
                                         .parseInt(RecoveryInfo[3 * i + 5]);
-                                tempd = Integer
+                                tempD = Integer
                                         .parseInt(RecoveryInfo[3 * i + 6]);
 
                                 // 恢复并进行初始化
-                                bullet = new Bullet(tempx, tempy, tempd);
+                                bullet = new Bullet(tempX, tempY, getDirection(tempD));
                                 GamePanel.myTank.bullets.add(bullet);
                                 Thread t = new Thread(bullet);
                                 t.start();
@@ -228,13 +227,13 @@ public class Recorder {
                 // 如果第一个标识符是2，数据就是普通墙的
                 if (n == 2) {
                     // 类型转换
-                    tempx = Integer.parseInt(RecoveryInfo[1]);
-                    tempy = Integer.parseInt(RecoveryInfo[2]);
+                    tempX = Integer.parseInt(RecoveryInfo[1]);
+                    tempY = Integer.parseInt(RecoveryInfo[2]);
 
                     // 恢复并进行初始化
-                    cwall = new CommentWall(tempx, tempy);
-                    cwall.isLive = true;
-                    GamePanel.CWalls.add(cwall);
+                    cWall = new CommonWall(tempX, tempY);
+                    cWall.isLive = true;
+                    GamePanel.CWalls.add(cWall);
                 }
             }
         } catch (Exception e) {
@@ -248,6 +247,21 @@ public class Recorder {
                 // 捕获错误
                 e2.printStackTrace();
             }
+        }
+    }
+
+    private Direction getDirection(int directNum) {
+        switch (directNum) {
+            case 0:
+                return Direction.UP;
+            case 1:
+                return Direction.RIGHT;
+            case 2:
+                return Direction.DOWN;
+            case 3:
+                return Direction.LEFT;
+            default:
+                return Direction.UP;
         }
     }
 

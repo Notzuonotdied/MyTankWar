@@ -1,7 +1,15 @@
 package Util;
 
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
+
 import javax.sound.sampled.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.Arrays;
 
 /**
  * 播放声音的类
@@ -14,7 +22,7 @@ public class Audio {
     }
 
     public void start() {
-        CommonUtil.getInstance().startThread(this::run);
+        CommonUtil.getInstance().startSingleThread(this::run);
     }
 
     private void run() {
@@ -29,18 +37,18 @@ public class Audio {
         }
 
         AudioFormat format = audioInputStream.getFormat();
-        SourceDataLine auline;
+        SourceDataLine sourceDataLine;
         DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
 
         try {
-            auline = (SourceDataLine) AudioSystem.getLine(info);
-            auline.open(format);
+            sourceDataLine = (SourceDataLine) AudioSystem.getLine(info);
+            sourceDataLine.open(format);
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
 
-        auline.start();
+        sourceDataLine.start();
         int nBytesRead = 0;
         // 这是缓冲
         byte[] abData = new byte[1024];
@@ -49,13 +57,13 @@ public class Audio {
             while (nBytesRead != -1) {
                 nBytesRead = audioInputStream.read(abData, 0, abData.length);
                 if (nBytesRead >= 0)
-                    auline.write(abData, 0, nBytesRead);
+                    sourceDataLine.write(abData, 0, nBytesRead);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            auline.drain();
-            auline.close();
+            sourceDataLine.drain();
+            sourceDataLine.close();
         }
 
     }

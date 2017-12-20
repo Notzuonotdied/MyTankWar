@@ -1,14 +1,18 @@
+import UIElement.BlockWall;
+import UIElement.CommonWall;
 import Util.Audio;
+import Util.CommonUtil;
+import Util.Direction;
 
 import java.awt.*;
 import java.util.Vector;
 
 public class Bullet implements Runnable {
     // 定义子弹的尺寸
-    private static final int bulletwidth = 12;
-    private static final int bulletheight = 12;
-    // 定义一个子弹集合
-    private static Vector<Bullet> bullets = new Vector<>();
+    private static final int bulletWidth = 12;
+    private static final int bulletHeight = 12;
+    // 定义子弹的速度
+    private static final int speed = 16;
     // 定义每一颗子弹的伤害值
     public static int damage = 25;
     // 子弹图片初始化
@@ -17,6 +21,7 @@ public class Bullet implements Runnable {
 
     static {
         BulletImages = new Image[]{
+                // 上 左 下 右
                 Toolkit.getDefaultToolkit().getImage(
                         Bullet.class.getResource("/images/bullet1.gif")),
                 Toolkit.getDefaultToolkit().getImage(
@@ -33,12 +38,10 @@ public class Bullet implements Runnable {
     // 定义子弹的存在状态
     boolean isLive = true;
     // 定义方向
-    int direct = 0;
-    // 定义子弹的速度
-    private int speed = 16;
+    Direction direct;
 
     // 构造函数
-    public Bullet(int x, int y, int direct) {
+    public Bullet(int x, int y, Direction direct) {
         this.x = x;
         this.y = y;
         this.direct = direct;
@@ -47,16 +50,16 @@ public class Bullet implements Runnable {
     // 画出子弹
     public void drawBullet(Graphics g) {
         switch (direct) {
-            case 0:
+            case UP:
                 g.drawImage(BulletImages[0], x, y, null);
                 break;
-            case 1:
+            case RIGHT:
                 g.drawImage(BulletImages[1], x, y, null);
                 break;
-            case 2:
+            case DOWN:
                 g.drawImage(BulletImages[2], x, y, null);
                 break;
-            case 3:
+            case LEFT:
                 g.drawImage(BulletImages[3], x, y, null);
                 break;
         }
@@ -65,7 +68,7 @@ public class Bullet implements Runnable {
     // 判断怪物和我的子弹与普通墙相遇的时候--击中普通墙，则普通墙消失，子弹也消失
     public boolean BulletComeAcrossCWall(Bullet bullet) {
         for (int i = 0; i < GamePanel.CWalls.size(); i++) {
-            CommentWall CWall = GamePanel.CWalls.get(i);
+            CommonWall CWall = GamePanel.CWalls.get(i);
             if (CWall.getRect().intersects(bullet.bulletgetRect())) {
                 bullet.isLive = false;
                 CWall.isLive = false;
@@ -111,10 +114,9 @@ public class Bullet implements Runnable {
         for (int i = 0; i < GamePanel.monster.size(); i++) {
             // 取出怪物
             Monster mon = GamePanel.monster.get(i);
-            bullets = mon.getBullets();
+            Vector<Bullet> bullets = mon.getBullets();
             // 取出怪物的每一个子弹
-            for (int j = 0; j < bullets.size(); j++) {
-                Bullet bullet = bullets.get(j);
+            for (Bullet bullet : bullets) {
                 if (GamePanel.myTank.isLive) {
                     // 调用判断是否相交的函数
                     HitTank(bullet, GamePanel.myTank);
@@ -157,8 +159,7 @@ public class Bullet implements Runnable {
             try {
                 Thread.sleep(50);
                 // 启动声音
-                Audio audio = new Audio("Explosion.wav");
-                audio.start();
+                new Audio("Explosion.wav").start();
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -172,30 +173,26 @@ public class Bullet implements Runnable {
     public void run() {
         while (isLive) {
             switch (direct) {
-                case 0:
-                    // 上
+                case UP:
                     y -= speed;
                     break;
-                case 1:
-                    // 右
+                case RIGHT:
                     x += speed;
                     break;
-                case 2:
-                    // 下
+                case DOWN:
                     y += speed;
                     break;
-                case 3:
-                    // 左
+                case LEFT:
                     x -= speed;
                     break;
             }
             try {
-                Thread.sleep(66);
+                Thread.sleep(CommonUtil.SLEEPTIME);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             // 子弹何时死亡
-            if (x < 0 || x > MainFrame.rangx || y < 0 || y > MainFrame.rangy) {
+            if (x < 0 || x > MainFrame.rangX || y < 0 || y > MainFrame.rangY) {
                 this.isLive = false;
                 break;
             }
@@ -210,7 +207,7 @@ public class Bullet implements Runnable {
 
     // 调用子弹类的Rectangle函数
     public Rectangle bulletgetRect() {
-        return new Rectangle(x, y, bulletwidth, bulletheight);
+        return new Rectangle(x, y, bulletWidth, bulletHeight);
     }
 
 }

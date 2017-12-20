@@ -38,7 +38,7 @@ class GameStartPanel extends JPanel implements KeyListener {
     // 画出信息
     private void DrawInfo(Graphics g) {
 
-        g.fillRect(0, 0, MainFrame.screenwidth + 10, MainFrame.screenheight);
+        g.fillRect(0, 0, MainFrame.screenWidth + 10, MainFrame.screenHeight);
         // 提示信息
 
         g.setColor(Color.YELLOW);
@@ -88,8 +88,7 @@ class GameStartPanel extends JPanel implements KeyListener {
                     GameStartPanel.button1 = true;
                 }
                 // 启动声音
-                Audio audio = new Audio("StartGamePanel.wav");
-                audio.start();
+                new Audio("StartGamePanel.wav").start();
                 break;
         }
     }

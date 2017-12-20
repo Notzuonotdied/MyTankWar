@@ -7,7 +7,7 @@ public class Main {
         // 实例化
         MainFrame mainFrame = new MainFrame();
         // 启动线程
-        CommonUtil.getInstance().startThread(mainFrame::run);
+        CommonUtil.getInstance().startSingleThread(mainFrame::run);
     }
 
 }

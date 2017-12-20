@@ -1,4 +1,8 @@
-import Util.Audio;
+import UIElement.BlockWall;
+import UIElement.CommonWall;
+import UIElement.Tree;
+import Util.CommonUtil;
+import Util.Direction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +15,7 @@ import java.util.Vector;
 
 @SuppressWarnings("serial")
 // 游戏面板
-class GamePanel extends JPanel implements KeyListener, Runnable {
+public class GamePanel extends JPanel implements KeyListener, Runnable {
     // 定义我的坦克可以连发的子弹数
     private static final int buttleNumber = 2;
     // 设置关卡
@@ -23,33 +27,32 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
     public static boolean buttonWin = false;
     public static boolean buttonFail = false;
     // 定义我的坦克类
-    static MyTank myTank = null;
+    public static MyTank myTank = null;
     // 定义一个敌人的坦克集合
-    static Vector<Monster> monster = new Vector<>();
+    public static Vector<Monster> monster = new Vector<>();
     // 定义一个爆炸集合
-    static Bomb bomb = null;
-    static Vector<Bomb> bombs = new Vector<>();
-    static Vector<CommentWall> CWalls = new Vector<>();
-    // 定义一个石墙集合----这是内部的石墙
-    static Vector<BlockWall> BWalls_1 = new Vector<>();
+    public static Bomb bomb = null;
+    public static Vector<Bomb> bombs = new Vector<>();
+    public static Vector<CommonWall> CWalls = new Vector<>();
+    // 定义一个内部石墙集合
+    public static Vector<BlockWall> BWalls_1 = new Vector<>();
     // 总成绩
     private static int score = 0;
     // 控制是否在我的坦克死亡后继续游戏的变量
     private static boolean choice = false;
-    // 定义一个树木集合
-    Tree tr = null;
     private Vector<BlockWall> BWalls = new Vector<>();
     private Vector<Tree> tree = new Vector<>();
 
     // GamePanel构造函数
     GamePanel(int flag) {
         int size = 0;
+        Recorder recorder = new Recorder();
         // 判断记录的文本是否为空
         try {
             // 判读文本是否存在，不存在就新建一个空白文本
-            File f = new File("myrecoder.txt");
+            File f = new File(recorder.getFileName());
             if (f.exists()) {
-                FileInputStream fin = new FileInputStream("myrecoder.txt");
+                FileInputStream fin = new FileInputStream(recorder.getFileName());
                 // 获取
                 size = fin.available();
                 // 已经不需要判断了，关闭流
@@ -64,12 +67,12 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
 
             if (size != 0 && flag == 1) {
                 // 恢复数据
-                new Recorder().ReInfo();
+                recorder.ReInfo();
 
             } else {
                 // 创建我的坦克,设置坦克的位置
                 myTank = new MyTank(600, 500);
-                myTank.setDirect(0);
+                myTank.setDirect(Direction.UP);
                 // 创建怪物的坦克
                 for (int i = 0; i < GamePanel.monsterSize; i++) {
                     // 定义坦克的位置
@@ -77,21 +80,19 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
                     int moveSteps = r.nextInt(30) + 35;
                     Monster mon = new Monster((i + 1) * 80, moveSteps);
                     Monster.setTankNumber(monsterSize);
-                    mon.setDirect(2);
+                    mon.setDirect(Direction.DOWN);
                     // 启动敌人坦克
-                    Thread mont = new Thread(mon);
-                    mont.start();
+                    CommonUtil.getInstance().startCachedThread(mon);
                     // 将敌人坦克添加到坦克集合中
                     monster.add(mon);
                     // 为敌人添加子弹
                     Bullet bullet = new Bullet(
                             mon.getX() + TankMember.size / 2, mon.getY()
-                            + TankMember.size / 2, 2);
+                            + TankMember.size / 2, Direction.DOWN);
                     // 加到子弹集合中
                     mon.bullets.add(bullet);
                     // 启动子弹线程
-                    Thread t2 = new Thread(bullet);
-                    t2.start();
+                    CommonUtil.getInstance().startCachedThread(bullet);
                 }
                 // 初始化普通墙
                 DrawCWall();
@@ -111,8 +112,8 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         // 初始化背景图片
         Image Background = Toolkit.getDefaultToolkit().getImage(
                 GamePanel.class.getResource("/images/background.gif"));
-        g.drawImage(Background, 35, -160, MainFrame.screenwidth,
-                MainFrame.screenwidth + 80, null);
+        g.drawImage(Background, 35, -160, MainFrame.screenWidth,
+                MainFrame.screenWidth + 80, null);
 
         // 画出我的坦克
         DrawMyTank(g);
@@ -129,25 +130,25 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         // 初始化普通墙
         for (int i = 0; i < 15; i++) {
             if (i < 12) {
-                CWalls.add(new CommentWall(CommentWall.commentwallwidth
+                CWalls.add(new CommonWall(CommonWall.commonWallWidth
                         * (i + 4), 158));
-                CWalls.add(new CommentWall(CommentWall.commentwallwidth
+                CWalls.add(new CommonWall(CommonWall.commonWallWidth
                         * (i + 20), 158));
             }
-            CWalls.add(new CommentWall(154, CommentWall.commentwallheight
+            CWalls.add(new CommonWall(154, CommonWall.commonWallHeight
                     * (i + 8)));
-            CWalls.add(new CommentWall(632, CommentWall.commentwallheight
+            CWalls.add(new CommonWall(632, CommonWall.commonWallHeight
                     * (i + 8)));
         }
 
         for (int i = 0; i < 3; i++) {
-            CWalls.add(new CommentWall(CommentWall.commentwallwidth * (i + 13),
+            CWalls.add(new CommonWall(CommonWall.commonWallWidth * (i + 13),
                     215));
-            CWalls.add(new CommentWall(CommentWall.commentwallwidth * (i + 13),
+            CWalls.add(new CommonWall(CommonWall.commonWallWidth * (i + 13),
                     237));
-            CWalls.add(new CommentWall(CommentWall.commentwallwidth * (i + 21),
+            CWalls.add(new CommonWall(CommonWall.commonWallWidth * (i + 21),
                     215));
-            CWalls.add(new CommentWall(CommentWall.commentwallwidth * (i + 21),
+            CWalls.add(new CommonWall(CommonWall.commonWallWidth * (i + 21),
                     237));
         }
     }
@@ -226,7 +227,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
 
         // 画出普通墙
         for (int i = 0; i < GamePanel.CWalls.size(); i++) {
-            CommentWall cWall = GamePanel.CWalls.get(i);
+            CommonWall cWall = GamePanel.CWalls.get(i);
             // 如果普通墙存在状态为真就画出来
             if (cWall.isLive) {
                 cWall.drawCWall(g);
@@ -269,7 +270,8 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         // 提示信息
         if (monster.size() == 0 && myTank.isLive) {
             Font f = g.getFont();
-            g.setFont(new Font("TimesRoman", Font.BOLD, 60)); // 判断是否赢得比赛--赢了
+            // 判断是否赢得比赛--赢了
+            g.setFont(new Font("TimesRoman", Font.BOLD, 60));
             g.drawString("You are Winner！ ", 175, 310);
             g.setFont(f);
             // 选择方案
@@ -280,11 +282,11 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         }
         if (!myTank.isLive) {
             Font f = g.getFont();
-            g.setFont(new Font("TimesRoman", Font.BOLD, 60)); // 判断是否赢得比赛--输了
+            // 判断是否赢得比赛--输了
+            g.setFont(new Font("TimesRoman", Font.BOLD, 60));
             g.drawString("You are lost！ ", 180, 310);
             g.setFont(f);
             // 选择方案
-
             GamePanel.buttonFail = true;
         }
     }
@@ -294,64 +296,64 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         // 初始化除了普通墙外的所有墙体--注：其他的墙体都设置为无敌了，不可攻击
         // 初始化石墙-外部围墙
         for (int i = 0; i < 23; i++) {
-            BWalls.add(new BlockWall(BlockWall.BlockWallwidth * i, 0));
-            BWalls.add(new BlockWall(BlockWall.BlockWallwidth * i,
-                    MainFrame.screenheight - BlockWall.BlockWallheight));
-            BWalls.add(new BlockWall(0, BlockWall.BlockWallheight * i));
-            BWalls.add(new BlockWall(MainFrame.screenwidth
-                    - BlockWall.BlockWallwidth, BlockWall.BlockWallheight * i));
+            BWalls.add(new BlockWall(BlockWall.BlockWallWidth * i, 0));
+            BWalls.add(new BlockWall(BlockWall.BlockWallWidth * i,
+                    MainFrame.screenHeight - BlockWall.BlockWallHeight));
+            BWalls.add(new BlockWall(0, BlockWall.BlockWallHeight * i));
+            BWalls.add(new BlockWall(MainFrame.screenWidth
+                    - BlockWall.BlockWallWidth, BlockWall.BlockWallHeight * i));
         }
         // 初始化石墙-内部围墙
         for (int i = 0; i < 4; i++) {
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * (i + 6),
-                    BlockWall.BlockWallheight * 5));
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * (i + 13),
-                    BlockWall.BlockWallheight * 5));
+            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 6),
+                    BlockWall.BlockWallHeight * 5));
+            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 13),
+                    BlockWall.BlockWallHeight * 5));
         }
         // 初始化石墙-内部墙-上两个
         for (int i = 0; i < 5; i++) {
             if (i < 2) {
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * (i + 5),
-                        BlockWall.BlockWallheight * 10));
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * (i + 16),
-                        BlockWall.BlockWallheight * 10));
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * (i + 5),
-                        BlockWall.BlockWallheight * 11));
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * (i + 16),
-                        BlockWall.BlockWallheight * 11));
+                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 5),
+                        BlockWall.BlockWallHeight * 10));
+                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 16),
+                        BlockWall.BlockWallHeight * 10));
+                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 5),
+                        BlockWall.BlockWallHeight * 11));
+                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 16),
+                        BlockWall.BlockWallHeight * 11));
             } else {
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * (i + 8),
-                        BlockWall.BlockWallheight * 10));
+                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 8),
+                        BlockWall.BlockWallHeight * 10));
 
             }
         }
         // 初始化石墙-内部墙-最下一个
         for (int i = 0; i < 5; i++) {
             if (i == 0 || i == 4) {
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * (i + 9),
-                        BlockWall.BlockWallheight * 13));
+                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 9),
+                        BlockWall.BlockWallHeight * 13));
             } else {
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * (i + 9),
-                        BlockWall.BlockWallheight * 14));
+                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 9),
+                        BlockWall.BlockWallHeight * 14));
             }
         }
         // 初始化石墙-内部墙-左右两个
         for (int i = 0; i < 2; i++) {
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * 3,
-                    BlockWall.BlockWallheight * (i + 7)));
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * 19,
-                    BlockWall.BlockWallheight * (i + 7)));
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * 6,
-                    BlockWall.BlockWallheight * (i + 16)));
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallwidth * 16,
-                    BlockWall.BlockWallheight * (i + 16)));
+            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * 3,
+                    BlockWall.BlockWallHeight * (i + 7)));
+            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * 19,
+                    BlockWall.BlockWallHeight * (i + 7)));
+            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * 6,
+                    BlockWall.BlockWallHeight * (i + 16)));
+            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * 16,
+                    BlockWall.BlockWallHeight * (i + 16)));
         }
         // 初始化草丛
         for (int i = 0; i < 5; i++) {
-            tree.add(new Tree(Tree.Treewidth, Tree.Treeheight * (5 + i)));
-            tree.add(new Tree(Tree.Treewidth * 2, Tree.Treeheight * (5 + i)));
-            tree.add(new Tree(Tree.Treewidth * 19, Tree.Treeheight * (5 + i)));
-            tree.add(new Tree(Tree.Treewidth * 20, Tree.Treeheight * (5 + i)));
+            tree.add(new Tree(Tree.TreeWidth, Tree.TreeHeight * (5 + i)));
+            tree.add(new Tree(Tree.TreeWidth * 2, Tree.TreeHeight * (5 + i)));
+            tree.add(new Tree(Tree.TreeWidth * 19, Tree.TreeHeight * (5 + i)));
+            tree.add(new Tree(Tree.TreeWidth * 20, Tree.TreeHeight * (5 + i)));
         }
     }
 
@@ -362,20 +364,20 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
 
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            myTank.setDirect(2);
+            myTank.setDirect(Direction.DOWN);
             this.repaint();
             myTank.move();
         } else if (e.getKeyCode() == KeyEvent.VK_UP) {
             // 设置我的坦克的方向
-            myTank.setDirect(0);
+            myTank.setDirect(Direction.UP);
             this.repaint();
             myTank.move();
         } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            myTank.setDirect(3);
+            myTank.setDirect(Direction.LEFT);
             this.repaint();
             myTank.move();
         } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            myTank.setDirect(1);
+            myTank.setDirect(Direction.RIGHT);
             this.repaint();
             myTank.move();
         }
@@ -397,7 +399,7 @@ class GamePanel extends JPanel implements KeyListener, Runnable {
         // 刷新界面
         while (!GamePanel.choice) {
             try {
-                Thread.sleep(66);
+                Thread.sleep(30);
             } catch (Exception e) {
                 e.printStackTrace();
             }

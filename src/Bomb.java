@@ -1,7 +1,7 @@
 import java.awt.*;
 
 class Bomb {
-    static int step = 0;
+    private static int step = 0;
     // 爆炸效果图片初始化
     // 定义为全局静态变量
     private static Image[] BombImages = null;
@@ -9,16 +9,6 @@ class Bomb {
     static {
         try {
             BombImages = new Image[]{
-                    // ImageIO.read(new File("bomb1.gif")),
-                    // ImageIO.read(new File("bomb2.gif")),
-                    // ImageIO.read(new File("bomb3.gif")),
-                    // ImageIO.read(new File("bomb4.gif")),
-                    // ImageIO.read(new File("bomb5.gif")),
-                    // ImageIO.read(new File("bomb6.gif")),
-                    // ImageIO.read(new File("bomb7.gif")),
-                    // ImageIO.read(new File("bomb8.gif")),
-                    // ImageIO.read(new File("bomb.gif")),};
-
                     Toolkit.getDefaultToolkit().getImage(
                             Bomb.class.getResource("/images/1.png")),
                     Toolkit.getDefaultToolkit().getImage(
@@ -45,7 +35,6 @@ class Bomb {
 
     // 爆炸效果是否还存在，true为存在，false为不存在
     boolean isLive = true;
-    Graphics g;
     // 定义爆炸效果的左上角坐标（x,y）
     private int x;
     private int y;
@@ -70,7 +59,6 @@ class Bomb {
                     2 * TankMember.size, null);
             step++;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             System.out.println("输出图片出现问题了！");
             e.printStackTrace();
         }

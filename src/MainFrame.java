@@ -1,4 +1,5 @@
 import Util.Audio;
+import Util.CommonUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,11 +10,11 @@ import java.util.Objects;
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements ActionListener {
     // 定义显示屏幕的宽度和高度
-    public static final int screenwidth = 800;
-    public static final int screenheight = 700;
+    public static final int screenWidth = 800;
+    public static final int screenHeight = 700;
     // 定义坦克运动范围
-    public static final int rangx = screenwidth - TankMember.size;
-    public static final int rangy = screenheight - TankMember.size;
+    public static final int rangX = screenWidth - TankMember.size;
+    public static final int rangY = screenHeight - TankMember.size;
     private boolean button = false;
     // 定义组件
     private GamePanel gamepanel = null;
@@ -42,7 +43,7 @@ public class MainFrame extends JFrame implements ActionListener {
         String[] childMenuCommand = new String[]{
                 "start", "continue", "save",
                 "level1", "level2", "level3",
-                "exit", "savebeforeexit"
+                "exit", "saveBeforeExit"
         };
         MenuItem[] childMenus = new MenuItem[childMenusString.length];
         int[] separatorIndex = new int[]{3, 6};
@@ -56,7 +57,7 @@ public class MainFrame extends JFrame implements ActionListener {
         };
 
         String[] childMenuCommand2 = new String[]{
-                "instruction", "instruction1", "regameinstruction",
+                "instruction", "instruction1", "ContinueIntroduction",
                 "instruction2", "instruction3", "instruction4"
         };
         MenuItem[] childMenus2 = new MenuItem[childMenuString2.length];
@@ -102,7 +103,7 @@ public class MainFrame extends JFrame implements ActionListener {
         // 禁止用户改变窗体大小
         this.setResizable(false);
         // 设置窗体的尺寸
-        this.setSize(screenwidth, screenheight + 30);
+        this.setSize(screenWidth, screenHeight + 30);
         // 设置窗体出现的位置
         this.setLocation(250, 6);
         // 退出时清除占用的内存
@@ -159,30 +160,22 @@ public class MainFrame extends JFrame implements ActionListener {
                 break;
             case "start": {
                 GamePanel.monster.clear();
+                setGameLevel(0);
 
-                GamePanel.monsterSize = 6;
-                Monster.bulletsize = 2;
-                GamePanel.level = 0;
-
-                gamepanel = new GamePanel(0);
                 gamepanel.setBackground(Color.BLACK);
                 GamePanel.button = true;
 
-                Thread t = new Thread(gamepanel);
-                t.start();
+                CommonUtil.getInstance().startSingleThread(gamepanel);
 
                 // 启动声音
-                Audio audio = new Audio("bgm.wav");
-                audio.start();
+                new Audio("bgm.wav").start();
 
                 // 删除旧的面板
                 this.remove(gamestartpanel);
                 this.add(gamepanel);
                 // 监听
                 this.addKeyListener(gamepanel);
-
                 this.setVisible(true);
-
                 break;
             }
             case "level1": {
@@ -190,11 +183,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 if (response == 0) {
                     GamePanel.monster.clear();
                     GamePanel.CWalls.clear();
-
-                    GamePanel.monsterSize = 8;
-                    GamePanel.level = 1;
-                    Monster.bulletsize = 3;
-                    gamepanel = new GamePanel(0);
+                    setGamePanelAttr(8, 3, 1);
                 }
                 break;
             }
@@ -203,11 +192,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 if (response == 0) {
                     GamePanel.monster.clear();
                     GamePanel.CWalls.clear();
-
-                    GamePanel.monsterSize = 9;
-                    GamePanel.level = 2;
-                    Monster.bulletsize = 4;
-                    gamepanel = new GamePanel(0);
+                    setGamePanelAttr(9, 4, 2);
                 }
                 break;
             }
@@ -216,11 +201,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 if (response == 0) {
                     GamePanel.monster.clear();
                     GamePanel.CWalls.clear();
-
-                    GamePanel.monsterSize = 10;
-                    Monster.bulletsize = 5;
-                    GamePanel.level = 3;
-                    gamepanel = new GamePanel(0);
+                    setGamePanelAttr(10, 5, 3);
                 }
                 break;
             }
@@ -242,11 +223,10 @@ public class MainFrame extends JFrame implements ActionListener {
                 }
                 break;
             }
-            case "savebeforeexit": {
+            case "saveBeforeExit": {
                 Object[] options = {"保存并退出", "继续玩游戏"};
                 int response = showChoiceStyleDialog(options, "存盘并退出游戏？");
                 if (response == 0) {
-
                     // 保存我的坦克的信息和怪物的信息
                     Recorder rc = new Recorder();
                     rc.SaveMonsterInfo();
@@ -254,7 +234,6 @@ public class MainFrame extends JFrame implements ActionListener {
 
                     // 正常退出程序
                     System.exit(0);
-
                 }
                 break;
             }
@@ -285,15 +264,14 @@ public class MainFrame extends JFrame implements ActionListener {
                 gamepanel = new GamePanel(1);
 
                 // 启动线程
-                Thread t = new Thread(gamepanel);
-                t.start();
+                CommonUtil.getInstance().startSingleThread(gamepanel);
                 this.add(gamepanel);
                 // 监听
                 this.addKeyListener(gamepanel);
                 this.setVisible(true);
                 break;
             }
-            case "regameinstruction":
+            case "ContinueIntroduction":
                 showIntroduceDialog("继续游戏", "恢复游戏为保存的状态", "游戏帮助");
                 break;
         }
@@ -314,64 +292,27 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private void start() {
         if (GamePanel.buttonWin || GamePanel.buttonFail) {
+            if (GamePanel.buttonWin) {
+                Object[] options = {"确定", "取消"};
+                if (showChoiceDialog(options, "是否继续闯关") == 0) {
+                    GamePanel.monster.clear();
+                    GamePanel.CWalls.clear();
+                    // 设置游戏的段位
+                    setGameLevel(GamePanel.level + 1);
+                }
+                GamePanel.buttonWin = false;
+            }
+            if (GamePanel.buttonFail) {
+                Object[] options = {"确定", "取消"};
+                int response = showChoiceDialog(options, "是否继续游戏");
+                if (response == 0) {
+                    GamePanel.monster.clear();
+                    GamePanel.CWalls.clear();
+                    setGameLevel(GamePanel.level);
+                }
+                GamePanel.buttonFail = false;
+            }
             try {
-                if (GamePanel.buttonWin) {
-                    Object[] options = {"确定", "取消"};
-                    int response = showChoiceDialog(options, "是否继续闯关");
-                    if (response == 0) {
-                        GamePanel.monster.clear();
-                        GamePanel.CWalls.clear();
-
-                        if (GamePanel.level == 0) {
-                            GamePanel.monsterSize = 8;
-                            Monster.bulletsize = 3;
-                            GamePanel.level = 1;
-                            gamepanel = new GamePanel(0);
-
-                        } else if (GamePanel.level == 1) {
-                            GamePanel.monsterSize = 9;
-                            Monster.bulletsize = 4;
-                            GamePanel.level = 2;
-                            gamepanel = new GamePanel(0);
-
-                        } else if (GamePanel.level == 2) {
-                            GamePanel.monsterSize = 10;
-
-                            Monster.bulletsize = 10;
-                            GamePanel.level = 3;
-                            gamepanel = new GamePanel(0);
-                        }
-                    }
-                    GamePanel.buttonWin = false;
-                }
-                if (GamePanel.buttonFail) {
-                    Object[] options = {"确定", "取消"};
-                    int response = showChoiceDialog(options, "是否继续游戏");
-                    if (response == 0) {
-                        GamePanel.monster.clear();
-                        GamePanel.CWalls.clear();
-
-                        if (GamePanel.level == 0) {
-                            GamePanel.monsterSize = 6;
-                            Monster.bulletsize = 2;
-                            gamepanel = new GamePanel(0);
-                        } else if (GamePanel.level == 1) {
-                            GamePanel.monsterSize = 8;
-                            Monster.bulletsize = 3;
-                            gamepanel = new GamePanel(0);
-                        } else if (GamePanel.level == 2) {
-                            GamePanel.monsterSize = 9;
-                            Monster.bulletsize = 4;
-                            gamepanel = new GamePanel(0);
-                        } else if (GamePanel.level == 3) {
-                            GamePanel.monsterSize = 10;
-                            Monster.bulletsize = 10;
-                            gamepanel = new GamePanel(0);
-                        }
-                    }
-                    GamePanel.buttonFail = false;
-                }
-
                 Thread.sleep(1500);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -383,20 +324,16 @@ public class MainFrame extends JFrame implements ActionListener {
                 // 开始游戏
                 if (GameStartPanel.button1) {
                     GamePanel.monster.clear();
+                    // 设置游戏的段位
+                    setGameLevel(0);
 
-                    GamePanel.monsterSize = 6;
-                    Monster.bulletsize = 2;
-
-                    gamepanel = new GamePanel(0);
                     gamepanel.setBackground(Color.BLACK);
                     GamePanel.button = true;
 
-                    Thread t1 = new Thread(gamepanel);
-                    t1.start();
+                    CommonUtil.getInstance().startSingleThread(gamepanel);
 
                     // 启动声音
-                    Audio audio = new Audio("bgm.wav");
-                    audio.start();
+                    new Audio("bgm.wav").start();
                     // 删除旧的面板
                     this.remove(gamestartpanel);
                     this.add(gamepanel);
@@ -424,8 +361,7 @@ public class MainFrame extends JFrame implements ActionListener {
                     gamepanel = new GamePanel(1);
 
                     // 启动线程
-                    Thread t = new Thread(gamepanel);
-                    t.start();
+                    CommonUtil.getInstance().startSingleThread(gamepanel);
                     this.add(gamepanel);
                     // 监听
                     this.addKeyListener(gamepanel);
@@ -438,6 +374,33 @@ public class MainFrame extends JFrame implements ActionListener {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void setGameLevel(int level) {
+        switch (level) {
+            case 0:
+                setGamePanelAttr(6, 2, 0);
+                break;
+            case 1:
+                setGamePanelAttr(8, 3, 1);
+                break;
+            case 2:
+                setGamePanelAttr(9, 4, 2);
+                break;
+            case 3:
+                setGamePanelAttr(10, 10, 3);
+                break;
+            default:
+
+                break;
+        }
+    }
+
+    private void setGamePanelAttr(int monsterSize, int bulletSize, int level) {
+        GamePanel.monsterSize = monsterSize;
+        Monster.bulletOneTime = bulletSize;
+        GamePanel.level = level;
+        gamepanel = new GamePanel(0);
     }
 
     private int showChoiceDialog(Object[] options, String message) {

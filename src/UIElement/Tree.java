@@ -1,10 +1,12 @@
+package UIElement;
+
 import java.awt.*;
 
 public class Tree {
 
     // 定义墙的大小
-    public static int Treewidth = 36;
-    public static int Treeheight = 36;
+    public final static int TreeWidth = 36;
+    public final static int TreeHeight = 36;
 
     // 初始化墙的图片
     private static Image[] treeImags = null;
@@ -33,6 +35,6 @@ public class Tree {
     }
 
     public Rectangle getRect() {
-        return new Rectangle(x, y, Treewidth, Treeheight);
+        return new Rectangle(x, y, TreeWidth, TreeHeight);
     }
 }
