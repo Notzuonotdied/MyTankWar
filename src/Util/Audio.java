@@ -1,15 +1,7 @@
 package Util;
 
-import sun.audio.AudioPlayer;
-import sun.audio.AudioStream;
-
 import javax.sound.sampled.*;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URL;
-import java.util.Arrays;
 
 /**
  * 播放声音的类

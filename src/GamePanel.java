@@ -32,9 +32,6 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     public static MyTank myTank = null;
     // 定义一个敌人的坦克集合
     public static Vector<Monster> monster = new Vector<>();
-    // 定义一个爆炸集合
-    public static Bomb bomb = null;
-    public static Vector<Bomb> bombs = new Vector<>();
 
     // 总成绩
     private static int score = 0;
@@ -183,15 +180,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         CommonWall.getInstance().drawAllCWall(graphics);
         BlockWall.getInstance().drawAllBWall(graphics);
         Tree.getInstance().drawAllTree(graphics);
-        // 画出爆炸效果
-        for (int i = 0; i < GamePanel.bombs.size(); i++) {
-            bomb = GamePanel.bombs.get(i);
-            if (bomb.isLive) {
-                bomb.drawBomb(graphics);
-            } else {
-                bombs.remove(bomb);
-            }
-        }
+        Bomb.getInstance().drawAllBomb(graphics);
     }
 
     /**

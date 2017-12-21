@@ -168,6 +168,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
                 // 删除旧的面板
                 this.remove(gamestartpanel);
+                this.removeKeyListener(gamestartpanel);
                 this.add(gamepanel);
                 // 监听
                 this.addKeyListener(gamepanel);
@@ -227,23 +228,24 @@ public class MainFrame extends JFrame implements ActionListener {
             case "continue": {
                 // 删除旧的面板
                 this.remove(gamestartpanel);
+                this.removeKeyListener(gamestartpanel);
                 if (GamePanel.button) {
                     Object[] options = {"恢复游戏", "继续游戏"};
                     int response = showChoiceStyleDialog(options,
                             "恢复保存的游戏并放弃本次游戏？");
                     if (response == 0) {
                         this.remove(gamepanel);
+                        this.removeKeyListener(gamepanel);
                         // 清除原先储存在vector中的数据，防止多余的数据影响恢复体验
                         clearMonsterAndCWalls();
                     }
                 }
-                // 初始化界面
-                gamepanel = new GamePanel(1);
 
                 // 启动线程
                 CommonUtil.getInstance().startSingleThread(gamepanel);
+                // 初始化界面
+                this.gamepanel = new GamePanel(1);
                 this.add(gamepanel);
-                // 监听
                 this.addKeyListener(gamepanel);
                 this.setVisible(true);
                 break;
@@ -337,8 +339,8 @@ public class MainFrame extends JFrame implements ActionListener {
                     new Audio("bgm.wav").start();
                     // 删除旧的面板
                     this.remove(gamestartpanel);
+                    this.removeKeyListener(gamestartpanel);
                     this.add(gamepanel);
-                    // 监听
                     this.addKeyListener(gamepanel);
                     this.setVisible(true);
                     this.button = true;
@@ -347,13 +349,13 @@ public class MainFrame extends JFrame implements ActionListener {
                 if (GameStartPanel.button0) {
                     // 删除旧的面板
                     this.remove(gamestartpanel);
+                    this.removeKeyListener(gamestartpanel);
                     if (GamePanel.button) {
                         Object[] options = {"恢复游戏", "继续游戏"};
                         int response = showChoiceStyleDialog(options,
                                 "恢复保存的游戏并放弃本次游戏?");
                         if (response == 0) {
                             this.remove(gamepanel);
-
                             clearMonsterAndCWalls();
                         }
                     }
@@ -363,7 +365,6 @@ public class MainFrame extends JFrame implements ActionListener {
                     // 启动线程
                     CommonUtil.getInstance().startSingleThread(gamepanel);
                     this.add(gamepanel);
-                    // 监听
                     this.addKeyListener(gamepanel);
                     this.setVisible(true);
 
@@ -376,6 +377,11 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
 
+    /**
+     * 设置当前游戏的属性
+     *
+     * @param level 需要设置的等级
+     */
     private void setGameLevel(int level) {
         switch (level) {
             case 0:
@@ -433,5 +439,6 @@ public class MainFrame extends JFrame implements ActionListener {
         GamePanel.monster.clear();
         CommonWall.getInstance().initBWall();
     }
+
 }
 

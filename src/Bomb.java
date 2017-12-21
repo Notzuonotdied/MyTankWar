@@ -1,12 +1,14 @@
 import java.awt.*;
+import java.util.Vector;
 
 import static Util.CommonUtil.size;
 
 class Bomb {
+    private static final Vector<Bomb> bombs = new Vector<>();
     private static int step = 0;
     // 爆炸效果图片初始化
-    // 定义为全局静态变量
     private static Image[] BombImages = null;
+    private static Bomb bomb;
 
     static {
         try {
@@ -36,23 +38,60 @@ class Bomb {
     }
 
     // 爆炸效果是否还存在，true为存在，false为不存在
-    boolean isLive = true;
+    private boolean isLive = true;
     // 定义爆炸效果的左上角坐标（x,y）
     private int x;
     private int y;
+    private Bomb() {
+    }
 
-    // 构造函数
-    public Bomb(int x, int y) {
+    Bomb(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    // 画出爆炸效果
-    public void drawBomb(Graphics g) {
+    public static Bomb getInstance() {
+        if (bomb == null) {
+            synchronized (Bomb.class) {
+                if (bomb == null) {
+                    bomb = new Bomb();
+                }
+            }
+        }
+        return bomb;
+    }
+
+    public void add2Bombs(Bomb bomb) {
+        bombs.add(bomb);
+    }
+
+    /**
+     * 画出完整的爆炸效果
+     *
+     * @param graphics 画笔
+     */
+    public void drawAllBomb(Graphics graphics) {
+        // 画出爆炸效果
+        for (int i = 0; i < bombs.size(); i++) {
+            bomb = bombs.get(i);
+            if (bomb.isLive) {
+                bomb.drawBomb(graphics);
+            } else {
+                bombs.remove(bomb);
+            }
+        }
+    }
+
+    /**
+     * 画出爆炸效果
+     *
+     * @param g 画笔
+     */
+    private void drawBomb(Graphics g) {
         try {
             Thread.sleep(50);
             if (step == BombImages.length) {
-                GamePanel.bombs.remove(GamePanel.bomb);
+                bombs.remove(bomb);
                 step = 0;
                 this.isLive = false;
             }

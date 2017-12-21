@@ -90,7 +90,7 @@ class GameStartPanel extends JPanel implements KeyListener {
                     GameStartPanel.button1 = true;
                 }
                 // 启动声音
-                new Audio("StartGamePanel.wav").start();
+                new Audio("bgm.wav").start();
                 break;
         }
     }

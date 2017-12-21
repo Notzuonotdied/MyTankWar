@@ -8,8 +8,11 @@ import java.util.Random;
 
 import static Util.CommonUtil.size;
 
-// 怪物类
-// 由于怪物是多个的，且要求互不影响，所以要做成多线程的
+
+/**
+ * 怪物类
+ * 由于怪物是多个的，且要求互不影响，所以要做成多线程的
+ */
 public class Monster extends TankMember implements Runnable {
     // 定义怪物的停顿时间
     private static final int WaitingTime = 25;
@@ -41,12 +44,14 @@ public class Monster extends TankMember implements Runnable {
         TankNumber = tankNumber;
     }
 
-    // 定义我的坦克的移动函数
+    /**
+     * 定义我的坦克的移动函数
+     */
     public void move() {
         // 保存旧的位置,保证出现错误的移动可以恢复到原先的位置
         set2OldDirect();
-
-        switch (direct) { // 选择移动方向
+        // 选择移动方向
+        switch (direct) {
             case UP:
                 y -= speed;
                 break;
@@ -62,7 +67,11 @@ public class Monster extends TankMember implements Runnable {
         }
     }
 
-    // 防止重叠
+    /**
+     * 防止重叠
+     *
+     * @param direct 方向
+     */
     public boolean isTouchOtherTank(int direct) {
         for (int i = 0; i < GamePanel.monster.size(); i++) {
             Monster mon = GamePanel.monster.get(i);

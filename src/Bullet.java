@@ -70,7 +70,7 @@ public class Bullet implements Runnable {
     // 判断怪物和我的子弹与普通墙相遇的时候--击中普通墙，则普通墙消失，子弹也消失
     public boolean BulletComeAcrossCWall(Bullet bullet) {
         for (int i = 0; i < CommonWall.getInstance().getCWallsSize(); i++) {
-            if (CommonWall.getInstance().getCWallRectAt(i).intersects(bullet.bulletgetRect())) {
+            if (CommonWall.getInstance().getCWallRectAt(i).intersects(bullet.getBulletRect())) {
                 bullet.isLive = false;
                 CommonWall.getInstance().isLive = false;
                 CommonWall.getInstance().removeCWall(i);
@@ -83,7 +83,7 @@ public class Bullet implements Runnable {
     // 判断怪物和我的子弹与石墙相遇的时候--子弹消失
     public boolean BulletComeAcrossBWall(Bullet bullet, BlockWall blockWall) {
         for (int i = 0; i < blockWall.getBWalls_1Size(); i++) {
-            if (blockWall.getBWallRectAt(i).intersects(bullet.bulletgetRect())) {
+            if (blockWall.getBWallRectAt(i).intersects(bullet.getBulletRect())) {
                 bullet.isLive = false;
                 return false;
             }
@@ -97,7 +97,7 @@ public class Bullet implements Runnable {
             Monster mon = GamePanel.monster.get(i);
             for (int j = 0; j < mon.bullets.size(); j++) {
                 Bullet b = mon.bullets.get(j);
-                if (b.bulletgetRect().intersects(bullet.bulletgetRect())) {
+                if (b.getBulletRect().intersects(bullet.getBulletRect())) {
                     // 两者的存在状态都为死亡
                     bullet.isLive = false;
                     mon.bullets.remove(b);
@@ -119,7 +119,7 @@ public class Bullet implements Runnable {
             for (Bullet bullet : bullets) {
                 if (GamePanel.myTank.isLive) {
                     // 调用判断是否相交的函数
-                    HitTank(bullet, GamePanel.myTank);
+                    hitTank(bullet, GamePanel.myTank);
                 }
             }
         }
@@ -138,35 +138,30 @@ public class Bullet implements Runnable {
                     Monster mon = GamePanel.monster.get(j);
                     if (mon.isLive) {
                         // 调用判断是否相交的函数
-                        HitTank(bullet, mon);
+                        hitTank(bullet, mon);
                     }
                 }
             }
         }
     }
 
-    // 判断子弹是否击中了目标--我的坦克或者是怪物
-    public boolean HitTank(Bullet bullet, TankMember tank) {
-        if (bullet.bulletgetRect().intersects(tank.getRect())) {
+    /**
+     * 判断子弹是否击中了目标--我的坦克或者是怪物
+     *
+     * @param bullet 子弹
+     * @param tank   击中的坦克
+     */
+    private void hitTank(Bullet bullet, TankMember tank) {
+        if (bullet.getBulletRect().intersects(tank.getRect())) {
             // 两者的存在状态都为死亡
             bullet.isLive = false;
             tank.isLive = false;
             // 把子弹从子弹集合中去除
             tank.bullets.remove(bullet);
             // 新建爆炸效果
-            GamePanel.bomb = new Bomb(tank.getX(), tank.getY());
-            GamePanel.bombs.add(GamePanel.bomb);
-            try {
-                Thread.sleep(50);
-                // 启动声音
-                new Audio("Explosion.wav").start();
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            Bomb.getInstance().add2Bombs(new Bomb(tank.getX(), tank.getY()));
+            new Audio("Explosion.wav").start();
         }
-        return false;
     }
 
     // run函数
@@ -206,7 +201,7 @@ public class Bullet implements Runnable {
     }
 
     // 调用子弹类的Rectangle函数
-    public Rectangle bulletgetRect() {
+    private Rectangle getBulletRect() {
         return new Rectangle(x, y, bulletWidth, bulletHeight);
     }
 
