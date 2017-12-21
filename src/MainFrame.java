@@ -1,3 +1,4 @@
+import UIElement.CommonWall;
 import Util.Audio;
 import Util.CommonUtil;
 
@@ -173,33 +174,15 @@ public class MainFrame extends JFrame implements ActionListener {
                 this.setVisible(true);
                 break;
             }
-            case "level1": {
-                int response = showDialogMessage("是否使用级别1模式");
-                if (response == 0) {
-                    GamePanel.monster.clear();
-                    GamePanel.CWalls.clear();
-                    setGamePanelAttr(8, 3, 1);
-                }
+            case "level1":
+                Change2Level(1, "是否使用级别1模式");
                 break;
-            }
-            case "level2": {
-                int response = showDialogMessage("是否使用级别2模式");
-                if (response == 0) {
-                    GamePanel.monster.clear();
-                    GamePanel.CWalls.clear();
-                    setGamePanelAttr(9, 4, 2);
-                }
+            case "level2":
+                Change2Level(2, "是否使用级别2模式");
                 break;
-            }
-            case "level3": {
-                int response = showDialogMessage("是否使用级别3模式");
-                if (response == 0) {
-                    GamePanel.monster.clear();
-                    GamePanel.CWalls.clear();
-                    setGamePanelAttr(10, 5, 3);
-                }
+            case "level3":
+                Change2Level(3, "是否使用级别3模式");
                 break;
-            }
             case "instruction2":
                 showIntroduceDialog("级别1：", "改变怪物连发子弹数为：3，怪物数为：8", "游戏帮助");
                 break;
@@ -251,8 +234,7 @@ public class MainFrame extends JFrame implements ActionListener {
                     if (response == 0) {
                         this.remove(gamepanel);
                         // 清除原先储存在vector中的数据，防止多余的数据影响恢复体验
-                        GamePanel.monster.clear();
-                        GamePanel.CWalls.clear();
+                        clearMonsterAndCWalls();
                     }
                 }
                 // 初始化界面
@@ -269,6 +251,32 @@ public class MainFrame extends JFrame implements ActionListener {
             case "ContinueIntroduction":
                 showIntroduceDialog("继续游戏", "恢复游戏为保存的状态", "游戏帮助");
                 break;
+        }
+    }
+
+    /**
+     * 切换Level
+     *
+     * @param level   等级
+     * @param message 弹出的Dialog的信息
+     */
+    private void Change2Level(int level, String message) {
+        int response = showDialogMessage(message);
+        if (response == 0) {
+            switch (level) {
+                case 1:
+                    setGamePanelAttr(8, 3, 1);
+                    break;
+                case 2:
+                    setGamePanelAttr(9, 4, 2);
+                    break;
+                case 3:
+                    setGamePanelAttr(10, 5, 3);
+                    break;
+                default:
+                    break;
+            }
+            clearMonsterAndCWalls();
         }
     }
 
@@ -290,8 +298,7 @@ public class MainFrame extends JFrame implements ActionListener {
             if (GamePanel.buttonWin) {
                 Object[] options = {"确定", "取消"};
                 if (showChoiceDialog(options, "是否继续闯关") == 0) {
-                    GamePanel.monster.clear();
-                    GamePanel.CWalls.clear();
+                    clearMonsterAndCWalls();
                     // 设置游戏的段位
                     setGameLevel(GamePanel.level + 1);
                 }
@@ -301,8 +308,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 Object[] options = {"确定", "取消"};
                 int response = showChoiceDialog(options, "是否继续游戏");
                 if (response == 0) {
-                    GamePanel.monster.clear();
-                    GamePanel.CWalls.clear();
+                    clearMonsterAndCWalls();
                     setGameLevel(GamePanel.level);
                 }
                 GamePanel.buttonFail = false;
@@ -347,9 +353,8 @@ public class MainFrame extends JFrame implements ActionListener {
                                 "恢复保存的游戏并放弃本次游戏?");
                         if (response == 0) {
                             this.remove(gamepanel);
-                            // 清除原先储存在vector中的数据，防止多余的数据影响恢复体验
-                            GamePanel.monster.clear();
-                            GamePanel.CWalls.clear();
+
+                            clearMonsterAndCWalls();
                         }
                     }
                     // 初始化界面
@@ -421,6 +426,12 @@ public class MainFrame extends JFrame implements ActionListener {
                         new JLabel("<html><h2><font color='red'>" + redString +
                                 "：</font>" + content + "</h2></html>"),
                         title, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    private void clearMonsterAndCWalls() {
+        // 清除原先储存在vector中的数据，防止多余的数据影响恢复体验
+        GamePanel.monster.clear();
+        CommonWall.getInstance().initBWall();
     }
 }
 

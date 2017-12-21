@@ -205,9 +205,9 @@ public class MyTank extends TankMember {
     }
 
     public boolean isTouchCWall() {
-        for (int i = 0; i < GamePanel.CWalls.size(); i++) {
-            CommonWall CWall = GamePanel.CWalls.get(i);
-            if (GamePanel.myTank.getRect().intersects(CWall.getRect())) {
+        for (int i = 0; i < CommonWall.getInstance().getCWallsSize(); i++) {
+            if (GamePanel.myTank.getRect().intersects(
+                    CommonWall.getInstance().getCWallRectAt(i))) {
                 return true;
             }
         }
@@ -215,9 +215,9 @@ public class MyTank extends TankMember {
     }
 
     public boolean isTouchBWall() {
-        for (int i = 0; i < GamePanel.BWalls_1.size(); i++) {
-            BlockWall BWall = GamePanel.BWalls_1.get(i);
-            if (GamePanel.myTank.getRect().intersects(BWall.getRect())) {
+        for (int i = 0; i < BlockWall.getInstance().getBWalls_1Size(); i++) {
+            if (GamePanel.myTank.getRect().intersects(
+                    BlockWall.getInstance().getBWallRectAt(i))) {
                 return true;
             }
         }

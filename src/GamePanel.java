@@ -13,7 +13,6 @@ import java.io.FileInputStream;
 import java.util.Random;
 import java.util.Vector;
 
-import static Util.CommonUtil.screenHeight;
 import static Util.CommonUtil.screenWidth;
 
 @SuppressWarnings("serial")
@@ -36,15 +35,12 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     // 定义一个爆炸集合
     public static Bomb bomb = null;
     public static Vector<Bomb> bombs = new Vector<>();
-    public static Vector<CommonWall> CWalls = new Vector<>();
-    // 定义一个内部石墙集合
-    public static Vector<BlockWall> BWalls_1 = new Vector<>();
+
     // 总成绩
     private static int score = 0;
     // 控制是否在我的坦克死亡后继续游戏的变量
     private static boolean choice = false;
-    private Vector<BlockWall> BWalls = new Vector<>();
-    private Vector<Tree> tree = new Vector<>();
+
 
     // GamePanel构造函数
     GamePanel(int flag) {
@@ -95,16 +91,12 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                     // 启动子弹线程
                     CommonUtil.getInstance().startCachedThread(bullet);
                 }
-                // 初始化普通墙
-                DrawCWall();
             }
         } catch (Exception e) {
 
             e.printStackTrace();
         }
 
-        // 初始化石墙和树木
-        Initialization();
     }
 
     // 画笔函数
@@ -125,34 +117,6 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         DrawInfo(g);
     }
 
-    // 初始化普通墙
-    private void DrawCWall() {
-        // 初始化普通墙
-        for (int i = 0; i < 15; i++) {
-            if (i < 12) {
-                CWalls.add(new CommonWall(CommonWall.commonWallWidth
-                        * (i + 4), 158));
-                CWalls.add(new CommonWall(CommonWall.commonWallWidth
-                        * (i + 20), 158));
-            }
-            CWalls.add(new CommonWall(154, CommonWall.commonWallHeight
-                    * (i + 8)));
-            CWalls.add(new CommonWall(632, CommonWall.commonWallHeight
-                    * (i + 8)));
-        }
-
-        for (int i = 0; i < 3; i++) {
-            CWalls.add(new CommonWall(CommonWall.commonWallWidth * (i + 13),
-                    215));
-            CWalls.add(new CommonWall(CommonWall.commonWallWidth * (i + 13),
-                    237));
-            CWalls.add(new CommonWall(CommonWall.commonWallWidth * (i + 21),
-                    215));
-            CWalls.add(new CommonWall(CommonWall.commonWallWidth * (i + 21),
-                    237));
-        }
-    }
-
     // 画出我的坦克
     private void DrawMyTank(Graphics g) {
         // 画出我自己的坦克
@@ -167,7 +131,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             if (bullet != null && bullet.isLive && myTank.isLive
                     && bullet.BulletComeAcrossCWall(bullet)
                     && !bullet.BulletComeAcrossMonster(bullet)
-                    && bullet.BulletComeAcrossBWall(bullet)) {
+                    && bullet.BulletComeAcrossBWall(bullet, myTank.getBlockWall())) {
                 // 画出子弹的轨迹
                 bullet.drawBullet(g);
                 // 判断是否集中了怪物
@@ -192,7 +156,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                     // 取出一个子弹
                     Bullet bullet = mon.bullets.get(j);
                     if (bullet.isLive && bullet.BulletComeAcrossCWall(bullet)
-                            && bullet.BulletComeAcrossBWall(bullet)) {
+                            && bullet.BulletComeAcrossBWall(bullet, mon.getBlockWall())) {
                         // 画出子弹的轨迹
                         bullet.drawBullet(g);
                         // 判断是否击中了我的坦克
@@ -214,40 +178,19 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     /**
      * 画出墙,爆炸效果，树木，普通墙
      */
-    private void DrawItem(Graphics g) {
+    private void DrawItem(Graphics graphics) {
+
+        CommonWall.getInstance().drawAllCWall(graphics);
+        BlockWall.getInstance().drawAllBWall(graphics);
+        Tree.getInstance().drawAllTree(graphics);
         // 画出爆炸效果
         for (int i = 0; i < GamePanel.bombs.size(); i++) {
             bomb = GamePanel.bombs.get(i);
             if (bomb.isLive) {
-                bomb.drawBomb(g);
+                bomb.drawBomb(graphics);
             } else {
                 bombs.remove(bomb);
             }
-        }
-
-        // 画出普通墙
-        for (int i = 0; i < GamePanel.CWalls.size(); i++) {
-            CommonWall cWall = GamePanel.CWalls.get(i);
-            // 如果普通墙存在状态为真就画出来
-            if (cWall.isLive) {
-                cWall.drawCWall(g);
-            } else {
-                GamePanel.CWalls.remove(cWall);
-            }
-        }
-
-        // 画出外围石墙
-        for (BlockWall BWall : this.BWalls) {
-            BWall.drawBWall(g);
-        }
-        // 内部石墙
-        for (int i = 0; i < GamePanel.BWalls_1.size(); i++) {
-            GamePanel.BWalls_1.get(i).drawBWall(g);
-        }
-
-        // 画出树木
-        for (Tree aTree : this.tree) {
-            aTree.drawTree(g);
         }
     }
 
@@ -292,69 +235,6 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             g.setFont(f);
             // 选择方案
             GamePanel.buttonFail = true;
-        }
-    }
-
-    // 初始化工作
-    private void Initialization() {
-        // 初始化除了普通墙外的所有墙体--注：其他的墙体都设置为无敌了，不可攻击
-        // 初始化石墙-外部围墙
-        for (int i = 0; i < 23; i++) {
-            BWalls.add(new BlockWall(BlockWall.BlockWallWidth * i, 0));
-            BWalls.add(new BlockWall(BlockWall.BlockWallWidth * i, screenHeight - BlockWall.BlockWallHeight));
-            BWalls.add(new BlockWall(0, BlockWall.BlockWallHeight * i));
-            BWalls.add(new BlockWall(screenWidth - BlockWall.BlockWallWidth, BlockWall.BlockWallHeight * i));
-        }
-        // 初始化石墙-内部围墙
-        for (int i = 0; i < 4; i++) {
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 6),
-                    BlockWall.BlockWallHeight * 5));
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 13),
-                    BlockWall.BlockWallHeight * 5));
-        }
-        // 初始化石墙-内部墙-上两个
-        for (int i = 0; i < 5; i++) {
-            if (i < 2) {
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 5),
-                        BlockWall.BlockWallHeight * 10));
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 16),
-                        BlockWall.BlockWallHeight * 10));
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 5),
-                        BlockWall.BlockWallHeight * 11));
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 16),
-                        BlockWall.BlockWallHeight * 11));
-            } else {
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 8),
-                        BlockWall.BlockWallHeight * 10));
-            }
-        }
-        // 初始化石墙-内部墙-最下一个
-        for (int i = 0; i < 5; i++) {
-            if (i == 0 || i == 4) {
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 9),
-                        BlockWall.BlockWallHeight * 13));
-            } else {
-                BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 9),
-                        BlockWall.BlockWallHeight * 14));
-            }
-        }
-        // 初始化石墙-内部墙-左右两个
-        for (int i = 0; i < 2; i++) {
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * 3,
-                    BlockWall.BlockWallHeight * (i + 7)));
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * 19,
-                    BlockWall.BlockWallHeight * (i + 7)));
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * 6,
-                    BlockWall.BlockWallHeight * (i + 16)));
-            BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * 16,
-                    BlockWall.BlockWallHeight * (i + 16)));
-        }
-        // 初始化草丛
-        for (int i = 0; i < 5; i++) {
-            tree.add(new Tree(Tree.TreeWidth, Tree.TreeHeight * (5 + i)));
-            tree.add(new Tree(Tree.TreeWidth * 2, Tree.TreeHeight * (5 + i)));
-            tree.add(new Tree(Tree.TreeWidth * 19, Tree.TreeHeight * (5 + i)));
-            tree.add(new Tree(Tree.TreeWidth * 20, Tree.TreeHeight * (5 + i)));
         }
     }
 

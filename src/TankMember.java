@@ -7,14 +7,13 @@ import java.awt.*;
 import java.util.Random;
 import java.util.Vector;
 
-import static Util.CommonUtil.rangX;
-import static Util.CommonUtil.rangY;
-import static Util.CommonUtil.size;
+import static Util.CommonUtil.*;
 
 /**
  * 主类-坦克类
  */
 public abstract class TankMember {
+
     // 初始化坦克图片
     // 定义为全局静态变量
     private static Image[] tankImages;
@@ -64,6 +63,10 @@ public abstract class TankMember {
         this.oldX = x;
         this.oldY = y;
         this.random = new Random();
+    }
+
+    public BlockWall getBlockWall() {
+        return BlockWall.getInstance();
     }
 
     // 开火的能力
@@ -155,7 +158,7 @@ public abstract class TankMember {
     }
 
     // 判断是否越界
-    public boolean isTouchBorder() {
+    boolean isTouchBorder() {
         if (x < BlockWall.BlockWallWidth) {
             x = BlockWall.BlockWallWidth;
             return true;
@@ -174,6 +177,7 @@ public abstract class TankMember {
         }
         return false;
     }
+
 
     // 判断是否与普通墙相撞
     public abstract boolean isTouchCWall();

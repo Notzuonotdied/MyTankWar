@@ -69,12 +69,11 @@ public class Bullet implements Runnable {
 
     // 判断怪物和我的子弹与普通墙相遇的时候--击中普通墙，则普通墙消失，子弹也消失
     public boolean BulletComeAcrossCWall(Bullet bullet) {
-        for (int i = 0; i < GamePanel.CWalls.size(); i++) {
-            CommonWall CWall = GamePanel.CWalls.get(i);
-            if (CWall.getRect().intersects(bullet.bulletgetRect())) {
+        for (int i = 0; i < CommonWall.getInstance().getCWallsSize(); i++) {
+            if (CommonWall.getInstance().getCWallRectAt(i).intersects(bullet.bulletgetRect())) {
                 bullet.isLive = false;
-                CWall.isLive = false;
-                GamePanel.CWalls.remove(CWall);
+                CommonWall.getInstance().isLive = false;
+                CommonWall.getInstance().removeCWall(i);
                 return false;
             }
         }
@@ -82,10 +81,9 @@ public class Bullet implements Runnable {
     }
 
     // 判断怪物和我的子弹与石墙相遇的时候--子弹消失
-    public boolean BulletComeAcrossBWall(Bullet bullet) {
-        for (int i = 0; i < GamePanel.BWalls_1.size(); i++) {
-            BlockWall BWall = GamePanel.BWalls_1.get(i);
-            if (BWall.getRect().intersects(bullet.bulletgetRect())) {
+    public boolean BulletComeAcrossBWall(Bullet bullet, BlockWall blockWall) {
+        for (int i = 0; i < blockWall.getBWalls_1Size(); i++) {
+            if (blockWall.getBWallRectAt(i).intersects(bullet.bulletgetRect())) {
                 bullet.isLive = false;
                 return false;
             }

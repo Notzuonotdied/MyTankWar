@@ -529,11 +529,10 @@ public class Monster extends TankMember implements Runnable {
     }
 
     public boolean isTouchCWall() {
-        for (int i = 0; i < GamePanel.CWalls.size(); i++) {
-            CommonWall CWall = GamePanel.CWalls.get(i);
+        for (int i = 0; i < CommonWall.getInstance().getCWallsSize(); i++) {
             for (int j = 0; j < GamePanel.monster.size(); j++) {
                 Monster mon = GamePanel.monster.get(j);
-                if (CWall.getRect().intersects(mon.getRect())) {
+                if (CommonWall.getInstance().getCWallRectAt(i).intersects(mon.getRect())) {
                     return true;
                 }
             }
@@ -542,11 +541,10 @@ public class Monster extends TankMember implements Runnable {
     }
 
     public boolean isTouchBWall() {
-        for (int i = 0; i < GamePanel.BWalls_1.size(); i++) {
-            BlockWall BWall = GamePanel.BWalls_1.get(i);
+        for (int i = 0; i < BlockWall.getInstance().getBWalls_1Size(); i++) {
             for (int j = 0; j < GamePanel.monster.size(); j++) {
                 Monster mon = GamePanel.monster.get(j);
-                if (BWall.getRect().intersects(mon.getRect())) {
+                if (BlockWall.getInstance().getBWallRectAt(i).intersects(mon.getRect())) {
                     return true;
                 }
             }

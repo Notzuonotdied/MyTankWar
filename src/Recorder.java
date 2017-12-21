@@ -10,7 +10,6 @@ public class Recorder {
     private static BufferedWriter bw = null;
     private static FileReader fr = null;
     private static BufferedReader br = null;
-    private static CommonWall cWall = null;
     private String fileName = "myRecorder.txt";
 
     public String getFileName() {
@@ -24,14 +23,13 @@ public class Recorder {
             bw = new BufferedWriter(fw);
 
             // 保存所有活着的怪物的坐标和方向
-            for (int i = 0; i < GamePanel.CWalls.size(); i++) {
-                cWall = GamePanel.CWalls.get(i);
-                if (cWall.isLive) {
+            for (int i = 0; i < CommonWall.getInstance().getCWallsSize(); i++) {
+                if (CommonWall.getInstance().isLive) {
                     // 把活的怪物的数据读取出来
-                    String recorder = cWall.getX() + " " + cWall.getY();
                     // 把活的怪物的数据写入到文本中
                     // 2作为标识符，作为普通墙的标识符
-                    bw.write("2" + " " + recorder + "\r\n");
+                    bw.write("2" + " " + CommonWall.getInstance().getCWallAt(i).getX()
+                            + " " + CommonWall.getInstance().getCWallAt(i).getY() + "\r\n");
                 }
             }
         } catch (Exception e) {
@@ -231,9 +229,8 @@ public class Recorder {
                     tempY = Integer.parseInt(RecoveryInfo[2]);
 
                     // 恢复并进行初始化
-                    cWall = new CommonWall(tempX, tempY);
-                    cWall.isLive = true;
-                    GamePanel.CWalls.add(cWall);
+                    CommonWall.getInstance().isLive = true;
+                    CommonWall.getInstance().add2CWalls(new CommonWall(tempX, tempY));
                 }
             }
         } catch (Exception e) {
