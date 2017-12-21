@@ -7,6 +7,8 @@ import Util.Direction;
 import java.awt.*;
 import java.util.Vector;
 
+import static Util.CommonUtil.*;
+
 public class Bullet implements Runnable {
     // 定义子弹的尺寸
     private static final int bulletWidth = 12;
@@ -192,7 +194,7 @@ public class Bullet implements Runnable {
                 e.printStackTrace();
             }
             // 子弹何时死亡
-            if (x < 0 || x > MainFrame.rangX || y < 0 || y > MainFrame.rangY) {
+            if (x < 0 || x > rangX || y < 0 || y > rangY) {
                 this.isLive = false;
                 break;
             }
@@ -202,7 +204,7 @@ public class Bullet implements Runnable {
 
     // 调用坦克类的Rectangle函数
     public Rectangle getRect() {
-        return new Rectangle(x, y, TankMember.size, TankMember.size);
+        return new Rectangle(x, y, size, size);
     }
 
     // 调用子弹类的Rectangle函数

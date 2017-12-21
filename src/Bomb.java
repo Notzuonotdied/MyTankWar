@@ -1,5 +1,7 @@
 import java.awt.*;
 
+import static Util.CommonUtil.size;
+
 class Bomb {
     private static int step = 0;
     // 爆炸效果图片初始化
@@ -38,6 +40,7 @@ class Bomb {
     // 定义爆炸效果的左上角坐标（x,y）
     private int x;
     private int y;
+
     // 构造函数
     public Bomb(int x, int y) {
         this.x = x;
@@ -54,9 +57,7 @@ class Bomb {
                 this.isLive = false;
             }
             // System.out.println("画出爆炸效果！");
-            g.drawImage(BombImages[step], x - TankMember.size / 2, y
-                            - TankMember.size, 2 * TankMember.size,
-                    2 * TankMember.size, null);
+            g.drawImage(BombImages[step], x - size / 2, y - size, 2 * size, 2 * size, null);
             step++;
         } catch (Exception e) {
             System.out.println("输出图片出现问题了！");

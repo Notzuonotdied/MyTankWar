@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import static Util.CommonUtil.*;
+
 /**
  * 开始面板
  */
@@ -26,7 +28,7 @@ class GameStartPanel extends JPanel implements KeyListener {
     // 设置开始游戏继续游戏的位置
     private int InfoX = 320;
     private int InfoY = 400;
-    private int x = InfoX - TankMember.size / 2 * 3 - 8;
+    private int x = InfoX - size / 2 * 3 - 8;
     private int y = InfoY - 30;
 
     public void paint(Graphics g) {
@@ -38,7 +40,7 @@ class GameStartPanel extends JPanel implements KeyListener {
     // 画出信息
     private void DrawInfo(Graphics g) {
 
-        g.fillRect(0, 0, MainFrame.screenWidth + 10, MainFrame.screenHeight);
+        g.fillRect(0, 0, screenWidth + 10, screenHeight);
         // 提示信息
 
         g.setColor(Color.YELLOW);
@@ -70,11 +72,11 @@ class GameStartPanel extends JPanel implements KeyListener {
             case KeyEvent.VK_DOWN:
             case KeyEvent.VK_UP:
                 if (flag == 1) {
-                    this.x = InfoX - TankMember.size / 2 * 3;
+                    this.x = InfoX - size / 2 * 3;
                     this.y = InfoY + 15;
                     this.flag = 0;
                 } else {
-                    this.x = InfoX - TankMember.size / 2 * 3 - 8;
+                    this.x = InfoX - size / 2 * 3 - 8;
                     this.y = InfoY - 30;
                     this.flag = 1;
                 }

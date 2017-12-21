@@ -2,6 +2,8 @@ import UIElement.BlockWall;
 import UIElement.CommonWall;
 import Util.Direction;
 
+import static Util.CommonUtil.size;
+
 // 我的坦克类
 public class MyTank extends TankMember {
     // 定义坦克的速度

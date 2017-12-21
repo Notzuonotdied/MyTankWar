@@ -9,12 +9,7 @@ import java.util.Objects;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements ActionListener {
-    // 定义显示屏幕的宽度和高度
-    public static final int screenWidth = 800;
-    public static final int screenHeight = 700;
-    // 定义坦克运动范围
-    public static final int rangX = screenWidth - TankMember.size;
-    public static final int rangY = screenHeight - TankMember.size;
+
     private boolean button = false;
     // 定义组件
     private GamePanel gamepanel = null;
@@ -103,7 +98,7 @@ public class MainFrame extends JFrame implements ActionListener {
         // 禁止用户改变窗体大小
         this.setResizable(false);
         // 设置窗体的尺寸
-        this.setSize(screenWidth, screenHeight + 30);
+        this.setSize(CommonUtil.screenWidth, CommonUtil.screenHeight + 30);
         // 设置窗体出现的位置
         this.setLocation(250, 6);
         // 退出时清除占用的内存

@@ -13,6 +13,9 @@ import java.io.FileInputStream;
 import java.util.Random;
 import java.util.Vector;
 
+import static Util.CommonUtil.screenHeight;
+import static Util.CommonUtil.screenWidth;
+
 @SuppressWarnings("serial")
 // 游戏面板
 public class GamePanel extends JPanel implements KeyListener, Runnable {
@@ -86,9 +89,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                     // 将敌人坦克添加到坦克集合中
                     monster.add(mon);
                     // 为敌人添加子弹
-                    Bullet bullet = new Bullet(
-                            mon.getX() + TankMember.size / 2, mon.getY()
-                            + TankMember.size / 2, Direction.DOWN);
+                    Bullet bullet = new Bullet(mon.getX() + size / 2, mon.getY() + size / 2, Direction.DOWN);
                     // 加到子弹集合中
                     mon.bullets.add(bullet);
                     // 启动子弹线程
@@ -112,8 +113,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         // 初始化背景图片
         Image Background = Toolkit.getDefaultToolkit().getImage(
                 GamePanel.class.getResource("/images/background.gif"));
-        g.drawImage(Background, 35, -160, MainFrame.screenWidth,
-                MainFrame.screenWidth + 80, null);
+        g.drawImage(Background, 35, -160, screenWidth, screenWidth + 80, null);
 
         // 画出我的坦克
         DrawMyTank(g);
@@ -251,7 +251,11 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         }
     }
 
-    // 信息显示
+    /**
+     * 信息显示
+     *
+     * @param g 画笔
+     */
     private void DrawInfo(Graphics g) {
         // 左上角文字
         g.setColor(Color.black);
@@ -297,11 +301,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         // 初始化石墙-外部围墙
         for (int i = 0; i < 23; i++) {
             BWalls.add(new BlockWall(BlockWall.BlockWallWidth * i, 0));
-            BWalls.add(new BlockWall(BlockWall.BlockWallWidth * i,
-                    MainFrame.screenHeight - BlockWall.BlockWallHeight));
+            BWalls.add(new BlockWall(BlockWall.BlockWallWidth * i, screenHeight - BlockWall.BlockWallHeight));
             BWalls.add(new BlockWall(0, BlockWall.BlockWallHeight * i));
-            BWalls.add(new BlockWall(MainFrame.screenWidth
-                    - BlockWall.BlockWallWidth, BlockWall.BlockWallHeight * i));
+            BWalls.add(new BlockWall(screenWidth - BlockWall.BlockWallWidth, BlockWall.BlockWallHeight * i));
         }
         // 初始化石墙-内部围墙
         for (int i = 0; i < 4; i++) {
@@ -324,7 +326,6 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             } else {
                 BWalls_1.add(new BlockWall(BlockWall.BlockWallWidth * (i + 8),
                         BlockWall.BlockWallHeight * 10));
-
             }
         }
         // 初始化石墙-内部墙-最下一个

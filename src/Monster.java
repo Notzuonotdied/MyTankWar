@@ -6,6 +6,8 @@ import Util.Direction;
 
 import java.util.Random;
 
+import static Util.CommonUtil.size;
+
 // 怪物类
 // 由于怪物是多个的，且要求互不影响，所以要做成多线程的
 public class Monster extends TankMember implements Runnable {
@@ -61,24 +63,22 @@ public class Monster extends TankMember implements Runnable {
     }
 
     // 防止重叠
-    // public boolean isTouchOtherTank(int direct) {
-    // for (int i = 0; i < GamePanel.monster.size(); i++) {
-    // Monster mon = GamePanel.monster.get(i);
-    // if (this != mon) {
-    // if (mon.getRect().intersects(this.getRect())) {
-    // return true;
-    // }
-    // }
-    // }
-    // return false;
-    // }
-    //
-    // public boolean isTouchMyTank(Monster mon) {
-    // if (mon.getRect().intersects(GamePanel.myTank.getRect())) {
-    // return true;
-    // }
-    // return false;
-    // }
+    public boolean isTouchOtherTank(int direct) {
+        for (int i = 0; i < GamePanel.monster.size(); i++) {
+            Monster mon = GamePanel.monster.get(i);
+            if (this != mon) {
+                if (mon.getRect().intersects(this.getRect())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isTouchMyTank(Monster mon) {
+        return mon.getRect().intersects(GamePanel.myTank.getRect());
+    }
+
     public boolean isTouchOtherTank(Direction direct) {
         switch (this.direct) {
             case UP:

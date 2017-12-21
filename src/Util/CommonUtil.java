@@ -9,11 +9,19 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class CommonUtil {
 
+    // 定义显示屏幕的宽度和高度
+    public static final int screenWidth = 800;
+    public static final int screenHeight = 700;
+    // 定义坦克的宽度和长度
+    public final static int size = 35;
+    public static final int SLEEPTIME = 30;
+    // 定义坦克运动范围
+    public static final int rangX = screenWidth - size;
+    public static final int rangY = screenHeight - size;
     private static final int ProcessorNum = Runtime.getRuntime().availableProcessors();
     private static CommonUtil commonUtil;
     private static ExecutorService fixThreadPool = newFixedThreadPool(ProcessorNum * 4 + 1);
     private static ExecutorService cacheThreadPool;
-    public static final int SLEEPTIME = 30;
 
     private CommonUtil() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()

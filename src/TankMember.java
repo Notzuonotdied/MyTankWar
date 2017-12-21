@@ -7,12 +7,14 @@ import java.awt.*;
 import java.util.Random;
 import java.util.Vector;
 
+import static Util.CommonUtil.rangX;
+import static Util.CommonUtil.rangY;
+import static Util.CommonUtil.size;
+
 /**
  * 主类-坦克类
  */
 public abstract class TankMember {
-    // 定义坦克的宽度和长度
-    public final static int size = 35;
     // 初始化坦克图片
     // 定义为全局静态变量
     private static Image[] tankImages;
@@ -162,12 +164,12 @@ public abstract class TankMember {
             y = BlockWall.BlockWallHeight;
             return true;
         }
-        if (x + size > MainFrame.rangX) {
-            x = MainFrame.rangX - size;
+        if (x + size > rangX) {
+            x = rangX - size;
             return true;
         }
-        if (y + size > MainFrame.rangY) {
-            y = MainFrame.rangY - size;
+        if (y + size > rangY) {
+            y = rangY - size;
             return true;
         }
         return false;
