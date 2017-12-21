@@ -155,17 +155,14 @@ public class MainFrame extends JFrame implements ActionListener {
                 showIntroduceDialog("用→ ← ↑ ↓控制方向，空格键开火，回车键开始！", ")", "游戏帮助");
                 break;
             case "start": {
-                GamePanel.monster.clear();
+                Monster.getInstance().clearMonsters();
                 setGameLevel(0);
 
                 gamepanel.setBackground(Color.BLACK);
                 GamePanel.button = true;
-
                 CommonUtil.getInstance().startSingleThread(gamepanel);
-
                 // 启动声音
                 new Audio("bgm.wav").start();
-
                 // 删除旧的面板
                 this.remove(gamestartpanel);
                 this.removeKeyListener(gamestartpanel);
@@ -326,7 +323,7 @@ public class MainFrame extends JFrame implements ActionListener {
             try {
                 // 开始游戏
                 if (GameStartPanel.button1) {
-                    GamePanel.monster.clear();
+                    Monster.getInstance().clearMonsters();
                     // 设置游戏的段位
                     setGameLevel(0);
 
@@ -403,7 +400,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     private void setGamePanelAttr(int monsterSize, int bulletSize, int level) {
-        GamePanel.monsterSize = monsterSize;
+        Monster.monsterSize = monsterSize;
         Monster.bulletOneTime = bulletSize;
         GamePanel.level = level;
         gamepanel = new GamePanel(0);
@@ -436,7 +433,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private void clearMonsterAndCWalls() {
         // 清除原先储存在vector中的数据，防止多余的数据影响恢复体验
-        GamePanel.monster.clear();
+        Monster.getInstance().clearMonsters();
         CommonWall.getInstance().initBWall();
     }
 

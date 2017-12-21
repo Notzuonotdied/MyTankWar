@@ -78,8 +78,8 @@ public class Recorder {
             fw = new FileWriter(fileName);
             bw = new BufferedWriter(fw);
             // 保存所有活着的怪物的坐标和方向
-            for (int i = 0; i < GamePanel.monster.size(); i++) {
-                Monster mon = GamePanel.monster.get(i);
+            for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
+                Monster mon = Monster.getInstance().getMonsterAt(i);
                 if (mon.isLive) {
                     backupData(mon);
                 }
@@ -158,7 +158,7 @@ public class Recorder {
                     Monster mon = new Monster(tempX, tempY);
                     mon.direct = getDirection(tempD);
                     mon.isLive = true;
-                    GamePanel.monster.add(mon);
+                    Monster.getInstance().add2Monsters(mon);
                     // 启动敌人坦克
                     Thread mont = new Thread(mon);
                     mont.start();

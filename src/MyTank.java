@@ -19,8 +19,8 @@ public class MyTank extends TankMember {
     public boolean isTouchOtherTank(Direction direct) {
         switch (this.direct) {
             case UP:
-                for (int i = 0; i < GamePanel.monster.size(); i++) {
-                    Monster mon = GamePanel.monster.get(i);
+                for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
+                    Monster mon = Monster.getInstance().getMonsterAt(i);
                     if (mon.direct == Direction.UP || mon.direct == Direction.DOWN) {
                         // 左点
                         if (this.x >= mon.x && this.x <= mon.x + size + 1
@@ -48,9 +48,9 @@ public class MyTank extends TankMember {
                 break;
             case RIGHT:
                 // 取出所有的敌人坦克
-                for (int i = 0; i < GamePanel.monster.size(); i++) {
+                for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
                     // 取出第一个坦克
-                    Monster mon = GamePanel.monster.get(i);
+                    Monster mon = Monster.getInstance().getMonsterAt(i);
                     // 如果敌人的方向是向下或者向上
                     if (mon.direct == Direction.UP || mon.direct == Direction.DOWN) {
                         // 上点
@@ -80,9 +80,9 @@ public class MyTank extends TankMember {
                 break;
             case DOWN:
                 // 取出所有的敌人坦克
-                for (int i = 0; i < GamePanel.monster.size(); i++) {
+                for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
                     // 取出第一个坦克
-                    Monster mon = GamePanel.monster.get(i);
+                    Monster mon = Monster.getInstance().getMonsterAt(i);
                     // 如果敌人的方向是向下或者向上
                     if (mon.direct == Direction.UP || mon.direct == Direction.DOWN) {
                         // 我的左点
@@ -117,9 +117,9 @@ public class MyTank extends TankMember {
             case LEFT:
                 // 向左
                 // 取出所有的敌人坦克
-                for (int i = 0; i < GamePanel.monster.size(); i++) {
+                for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
                     // 取出第一个坦克
-                    Monster mon = GamePanel.monster.get(i);
+                    Monster mon = Monster.getInstance().getMonsterAt(i);
                     // 如果敌人的方向是向下或者向上
                     if (mon.direct == Direction.UP || mon.direct == Direction.DOWN) {
                         // 我的上一点

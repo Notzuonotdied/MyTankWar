@@ -93,8 +93,8 @@ public class Bullet implements Runnable {
 
     // 判断我的坦克的子弹和怪物的子弹相遇的情况，子弹相遇后抵消，都消失
     public boolean BulletComeAcrossMonster(Bullet bullet) {
-        for (int i = 0; i < GamePanel.monster.size(); i++) {
-            Monster mon = GamePanel.monster.get(i);
+        for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
+            Monster mon = Monster.getInstance().getMonsterAt(i);
             for (int j = 0; j < mon.bullets.size(); j++) {
                 Bullet b = mon.bullets.get(j);
                 if (b.getBulletRect().intersects(bullet.getBulletRect())) {
@@ -111,9 +111,9 @@ public class Bullet implements Runnable {
     // 判断怪物是否击中了我
     public void HitMyTank() {
         // 取出每一只怪物
-        for (int i = 0; i < GamePanel.monster.size(); i++) {
+        for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
             // 取出怪物
-            Monster mon = GamePanel.monster.get(i);
+            Monster mon = Monster.getInstance().getMonsterAt(i);
             Vector<Bullet> bullets = mon.getBullets();
             // 取出怪物的每一个子弹
             for (Bullet bullet : bullets) {
@@ -133,9 +133,9 @@ public class Bullet implements Runnable {
             Bullet bullet = GamePanel.myTank.bullets.get(i);
             if (bullet.isLive) {
                 // 取出每只怪物，进行匹配
-                for (int j = 0; j < GamePanel.monster.size(); j++) {
+                for (int j = 0; j < Monster.getInstance().getMonsterSize(); j++) {
                     // 取出怪物
-                    Monster mon = GamePanel.monster.get(j);
+                    Monster mon = Monster.getInstance().getMonsterAt(j);
                     if (mon.isLive) {
                         // 调用判断是否相交的函数
                         hitTank(bullet, mon);

@@ -1,7 +1,6 @@
 import UIElement.BlockWall;
 import UIElement.CommonWall;
 import UIElement.Tree;
-import Util.CommonUtil;
 import Util.Direction;
 
 import javax.swing.*;
@@ -10,8 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Random;
-import java.util.Vector;
 
 import static Util.CommonUtil.screenWidth;
 
@@ -22,16 +19,12 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     private static final int buttleNumber = 2;
     // 设置关卡
     public static int level = 0;
-    // 定义怪物的数量
-    public static int monsterSize = 6;
     // 控制界面是否移除的变量
     public static boolean button = false;
     public static boolean buttonWin = false;
     public static boolean buttonFail = false;
     // 定义我的坦克类
     public static MyTank myTank = null;
-    // 定义一个敌人的坦克集合
-    public static Vector<Monster> monster = new Vector<>();
 
     // 总成绩
     private static int score = 0;
@@ -69,25 +62,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 // 创建我的坦克,设置坦克的位置
                 myTank = new MyTank(600, 500);
                 myTank.setDirect(Direction.UP);
-                // 创建怪物的坦克
-                for (int i = 0; i < GamePanel.monsterSize; i++) {
-                    // 定义坦克的位置
-                    Random r = new Random();
-                    int moveSteps = r.nextInt(30) + 35;
-                    Monster mon = new Monster((i + 1) * 80, moveSteps);
-                    Monster.setTankNumber(monsterSize);
-                    mon.setDirect(Direction.DOWN);
-                    // 启动敌人坦克
-                    CommonUtil.getInstance().startCachedThread(mon);
-                    // 将敌人坦克添加到坦克集合中
-                    monster.add(mon);
-                    // 为敌人添加子弹
-                    Bullet bullet = new Bullet(mon.getX() + size / 2, mon.getY() + size / 2, Direction.DOWN);
-                    // 加到子弹集合中
-                    mon.bullets.add(bullet);
-                    // 启动子弹线程
-                    CommonUtil.getInstance().startCachedThread(bullet);
-                }
+                Monster.getInstance().restoreMonsters();
             }
         } catch (Exception e) {
 
@@ -144,39 +119,13 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
 
     // 画出怪物
     private void DrawMonster(Graphics g) {
-        for (int i = 0; i < monster.size(); i++) {
-            Monster mon = monster.get(i);
-            if (mon.isLive) {
-                mon.drawTank(mon.getX(), mon.getY(), g, 1);
-                this.repaint();
-                for (int j = 0; j < mon.bullets.size(); j++) {
-                    // 取出一个子弹
-                    Bullet bullet = mon.bullets.get(j);
-                    if (bullet.isLive && bullet.BulletComeAcrossCWall(bullet)
-                            && bullet.BulletComeAcrossBWall(bullet, mon.getBlockWall())) {
-                        // 画出子弹的轨迹
-                        bullet.drawBullet(g);
-                        // 判断是否击中了我的坦克
-                        bullet.HitMyTank();
-                    }
-                    if (!bullet.isLive) {
-                        mon.bullets.remove(bullet);
-                    }
-                }
-            }
-            // 怪物死亡就移除
-            if (!mon.isLive) {
-                monster.remove(mon);
-                GamePanel.score++;
-            }
-        }
+        score = Monster.getInstance().drawAllMonster(this, g, score);
     }
 
     /**
      * 画出墙,爆炸效果，树木，普通墙
      */
     private void DrawItem(Graphics graphics) {
-
         CommonWall.getInstance().drawAllCWall(graphics);
         BlockWall.getInstance().drawAllBWall(graphics);
         Tree.getInstance().drawAllTree(graphics);
@@ -200,11 +149,11 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         // 提示信息文字属性设置
         g.setColor(Color.RED);
         g.setFont(new Font("TimesRoman", Font.ITALIC, 30));
-        g.drawString("" + GamePanel.monster.size(), 520, 23);
+        g.drawString("" + Monster.getInstance().getMonsterSize(), 520, 23);
         g.drawString("" + GamePanel.score, 640, 23);
 
         // 提示信息
-        if (monster.size() == 0 && myTank.isLive) {
+        if (Monster.getInstance().getMonsterSize() == 0 && myTank.isLive) {
             Font f = g.getFont();
             // 判断是否赢得比赛--赢了
             g.setFont(new Font("TimesRoman", Font.BOLD, 60));

@@ -55,6 +55,9 @@ public abstract class TankMember {
     // 定义子弹集合
     private Bullet bullet = null;
     private int oldX, oldY;
+    protected TankMember() {
+
+    }
 
     // 以下为成员变量的构造函数
     TankMember(int x, int y) {
