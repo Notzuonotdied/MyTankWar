@@ -32,7 +32,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     private static boolean choice = false;
 
 
-    // GamePanel构造函数
+    /**
+     * GamePanel构造函数
+     */
     GamePanel(int flag) {
         int size = 0;
         Recorder recorder = new Recorder();

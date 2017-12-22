@@ -7,7 +7,8 @@ import Util.Direction;
 import java.awt.*;
 import java.util.Vector;
 
-import static Util.CommonUtil.*;
+import static Util.CommonUtil.rangX;
+import static Util.CommonUtil.rangY;
 
 public class Bullet implements Runnable {
     // 定义子弹的尺寸
@@ -67,7 +68,9 @@ public class Bullet implements Runnable {
         }
     }
 
-    // 判断怪物和我的子弹与普通墙相遇的时候--击中普通墙，则普通墙消失，子弹也消失
+    /**
+     * 判断怪物和我的子弹与普通墙相遇的时候--击中普通墙，则普通墙消失，子弹也消失
+     */
     public boolean BulletComeAcrossCWall(Bullet bullet) {
         for (int i = 0; i < CommonWall.getInstance().getCWallsSize(); i++) {
             if (CommonWall.getInstance().getCWallRectAt(i).intersects(bullet.getBulletRect())) {
@@ -80,7 +83,9 @@ public class Bullet implements Runnable {
         return true;
     }
 
-    // 判断怪物和我的子弹与石墙相遇的时候--子弹消失
+    /**
+     * 判断怪物和我的子弹与石墙相遇的时候--子弹消失
+     */
     public boolean BulletComeAcrossBWall(Bullet bullet, BlockWall blockWall) {
         for (int i = 0; i < blockWall.getBWalls_1Size(); i++) {
             if (blockWall.getBWallRectAt(i).intersects(bullet.getBulletRect())) {
@@ -91,7 +96,9 @@ public class Bullet implements Runnable {
         return true;
     }
 
-    // 判断我的坦克的子弹和怪物的子弹相遇的情况，子弹相遇后抵消，都消失
+    /**
+     * 判断我的坦克的子弹和怪物的子弹相遇的情况，子弹相遇后抵消，都消失
+     */
     public boolean BulletComeAcrossMonster(Bullet bullet) {
         for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
             Monster mon = Monster.getInstance().getMonsterAt(i);
@@ -108,7 +115,9 @@ public class Bullet implements Runnable {
         return false;
     }
 
-    // 判断怪物是否击中了我
+    /**
+     * 判断怪物是否击中了我
+     */
     public void HitMyTank() {
         // 取出每一只怪物
         for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
@@ -125,7 +134,9 @@ public class Bullet implements Runnable {
         }
     }
 
-    // 判断我的坦克的子弹是否击中了怪物
+    /**
+     * 判断我的坦克的子弹是否击中了怪物
+     */
     public void HitMonster() {
         // 判断是否击中了怪物
         for (int i = 0; i < GamePanel.myTank.bullets.size(); i++) {
@@ -164,7 +175,9 @@ public class Bullet implements Runnable {
         }
     }
 
-    // run函数
+    /**
+     * run函数
+     */
     public void run() {
         while (isLive) {
             switch (direct) {
@@ -195,12 +208,9 @@ public class Bullet implements Runnable {
         }
     }
 
-    // 调用坦克类的Rectangle函数
-    public Rectangle getRect() {
-        return new Rectangle(x, y, size, size);
-    }
-
-    // 调用子弹类的Rectangle函数
+    /**
+     * 调用子弹类的Rectangle函数
+     */
     private Rectangle getBulletRect() {
         return new Rectangle(x, y, bulletWidth, bulletHeight);
     }

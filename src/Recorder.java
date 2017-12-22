@@ -215,8 +215,7 @@ public class Recorder {
                                 // 恢复并进行初始化
                                 bullet = new Bullet(tempX, tempY, getDirection(tempD));
                                 GamePanel.myTank.bullets.add(bullet);
-                                Thread t = new Thread(bullet);
-                                t.start();
+                                CommonUtil.getInstance().startCachedThread(bullet);
                             }
                         }
                     }

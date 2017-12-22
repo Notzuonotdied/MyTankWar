@@ -8,6 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
 
+enum GameStatus {
+    StartGame, ShowStartScreen
+}
+
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements ActionListener {
 
@@ -233,7 +237,6 @@ public class MainFrame extends JFrame implements ActionListener {
                     if (response == 0) {
                         this.remove(gamepanel);
                         this.removeKeyListener(gamepanel);
-                        // 清除原先储存在vector中的数据，防止多余的数据影响恢复体验
                         clearMonsterAndCWalls();
                     }
                 }
@@ -353,6 +356,7 @@ public class MainFrame extends JFrame implements ActionListener {
                                 "恢复保存的游戏并放弃本次游戏?");
                         if (response == 0) {
                             this.remove(gamepanel);
+                            this.removeKeyListener(gamepanel);
                             clearMonsterAndCWalls();
                         }
                     }
@@ -431,11 +435,35 @@ public class MainFrame extends JFrame implements ActionListener {
                         title, JOptionPane.PLAIN_MESSAGE);
     }
 
+    /**
+     * 清除原先储存在vector中的数据，防止多余的数据影响恢复体验
+     */
     private void clearMonsterAndCWalls() {
-        // 清除原先储存在vector中的数据，防止多余的数据影响恢复体验
         Monster.getInstance().clearMonsters();
         CommonWall.getInstance().initBWall();
     }
 
+    /**
+     * 重置游戏状态
+     *
+     * @param gameStatus 游戏状态，StartGame为开始游戏，ShowStartScreen显示开始面板
+     */
+    private void resetGamePanel(GameStatus gameStatus) {
+        switch (gameStatus) {
+            case StartGame:
+                this.remove(gamestartpanel);
+                this.removeKeyListener(gamestartpanel);
+                this.add(gamepanel);
+                this.addKeyListener(gamepanel);
+                break;
+            case ShowStartScreen:
+                this.remove(gamepanel);
+                this.removeKeyListener(gamepanel);
+                this.add(gamestartpanel);
+                this.addKeyListener(gamestartpanel);
+                break;
+            default:
+                break;
+        }
+    }
 }
-

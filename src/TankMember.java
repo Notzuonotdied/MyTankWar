@@ -15,7 +15,6 @@ import static Util.CommonUtil.*;
 public abstract class TankMember {
 
     // 初始化坦克图片
-    // 定义为全局静态变量
     private static Image[] tankImages;
 
     static {
@@ -44,18 +43,16 @@ public abstract class TankMember {
     public int x;
     public int y;
     // 定义坦克的方向
-    // 说明：0为方向上，1为方向右，2为方向下，3为方向左
     public Direction direct = Direction.UP;
     // 定义坦克的速度
     int speed = 5;
     Vector<Bullet> bullets = new Vector<>();
     private Random random;
-    // 定义一个类型：0.为我的坦克，1.为怪物
-    private int type;
     // 定义子弹集合
     private Bullet bullet = null;
     private int oldX, oldY;
-    protected TankMember() {
+
+    TankMember() {
 
     }
 
@@ -81,63 +78,72 @@ public abstract class TankMember {
         switch (this.direct) {
             case UP:
                 bullet = new Bullet(x + (size - 8) / 2, y, Direction.UP);
-                bullets.add(bullet);
                 break;
             case RIGHT:
                 bullet = new Bullet(x + size / 2, y + (size - 6) / 2, Direction.RIGHT);
-                bullets.add(bullet);
                 break;
             case DOWN:
                 bullet = new Bullet(x + (size - 10) / 2, y + size / 2, Direction.DOWN);
-                bullets.add(bullet);
                 break;
             case LEFT:
                 bullet = new Bullet(x, y + (size - 6) / 2, Direction.LEFT);
-                bullets.add(bullet);
                 break;
         }
+        bullets.add(bullet);
         // 启动子弹线程
         CommonUtil.getInstance().startCachedThread(bullet);
     }
 
-    // 画出坦克的函数
+    /**
+     * 画出坦克的函数
+     *
+     * @param x    坦克的左上角的x
+     * @param y    坦克左上角的y
+     * @param g    画笔
+     * @param type 坦克的类型，1是Monster，0是MyTank
+     */
     public void drawTank(int x, int y, Graphics g, int type) {
         switch (direct) {
             case UP:
-                if (type == 1) {
-                    g.drawImage(tankImages[0], x, y, null);
-                } else {
-                    g.drawImage(tankImages[4], x - 7, y - 7, null);
-                }
+                drawATank(0, x, y, type, g);
                 break;
             case RIGHT:
-                if (type == 1) {
-                    g.drawImage(tankImages[1], x, y, null);
-                } else {
-                    g.drawImage(tankImages[5], x - 7, y - 7, null);
-                }
+                drawATank(1, x, y, type, g);
                 break;
             case DOWN:
-                if (type == 1) {
-                    g.drawImage(tankImages[2], x, y, null);
-                } else {
-                    g.drawImage(tankImages[6], x - 7, y - 7, null);
-                }
+                drawATank(2, x, y, type, g);
                 break;
             case LEFT:
-                if (type == 1) {
-                    g.drawImage(tankImages[3], x, y, null);
-                } else {
-                    g.drawImage(tankImages[7], x - 7, y - 7, null);
-                }
+                drawATank(3, x, y, type, g);
                 break;
         }
     }
 
-    // 定义我的坦克的移动函数
+    /**
+     * 绘制一个坦克
+     *
+     * @param index    图片的索引
+     * @param x        坦克的左上角的x
+     * @param y        坦克左上角的y
+     * @param type     坦克的类型，1是Monster，0是MyTank
+     * @param graphics 画笔
+     */
+    private void drawATank(int index, int x, int y, int type, Graphics graphics) {
+        if (type == 1) {
+            graphics.drawImage(tankImages[index], x, y, null);
+        } else {
+            graphics.drawImage(tankImages[index + 4], x - 7, y - 7, null);
+        }
+    }
+
+    /**
+     * 定义我的坦克的移动函数
+     */
     public abstract void move();
 
-    // 一旦与其他坦克相遇就转向
+    /**
+     * 一旦与其他坦克相遇就转向
+     */
     public Direction DictionDirection(Direction direct) {
         while (direct == Direction.UP) {
             this.direct = getRandomDirection();
@@ -182,30 +188,54 @@ public abstract class TankMember {
     }
 
 
-    // 判断是否与普通墙相撞
+    /**
+     * 判断是否与普通墙相撞
+     * */
     public abstract boolean isTouchCWall();
 
-    // 判断是否与石墙相撞
+    /**
+     * 判断是否与石墙相撞
+     * */
     public abstract boolean isTouchBWall();
 
-    // 判断是否接触
-    public abstract boolean isTouchOtherTank(Direction direct);
+    /**
+     * 判断是否接触
+     * */
+    public abstract boolean isTouchOtherTank();
 
-    // 调用Rectangle函数
+    /**
+     * 调用Rectangle函数
+     * */
     public Rectangle getRect() {
         return new Rectangle(this.x, this.y, size, size);
     }
 
-    // 保存旧的位置,保证出现错误的移动可以恢复到原先的位置
-    public void set2OldDirect() {
+    /**
+     * 保存旧的位置,保证出现错误的移动可以恢复到原先的位置
+     */
+    protected void set2OldDirect() {
         this.oldX = x;
         this.oldY = y;
     }
 
-    // 在出现错误的移动后，改变现有位置为保存的旧的位置
-    public void chang2OldDirect() {
+    /**
+     * 在出现错误的移动后，改变现有位置为保存的旧的位置
+     */
+    private void chang2OldDirect() {
         x = oldX;
         y = oldY;
+    }
+
+    protected boolean canMove() {
+        return !isTouchOtherTank() && !isTouchBorder() && !isTouchCWall() && !isTouchBWall();
+    }
+
+    protected boolean afterMoveIsOkay() {
+        if (isTouchOtherTank() || isTouchBorder() || isTouchCWall() || isTouchBWall()) {
+            chang2OldDirect();
+            return true;
+        }
+        return false;
     }
 
     public int getX() {
