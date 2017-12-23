@@ -1,3 +1,5 @@
+package Hero;
+
 import UIElement.BlockWall;
 import UIElement.CommonWall;
 import Util.Audio;
@@ -126,9 +128,9 @@ public class Bullet implements Runnable {
             Vector<Bullet> bullets = mon.getBullets();
             // 取出怪物的每一个子弹
             for (Bullet bullet : bullets) {
-                if (GamePanel.myTank.isLive) {
+                if (MyTank.getInstance().isLive) {
                     // 调用判断是否相交的函数
-                    hitTank(bullet, GamePanel.myTank);
+                    hitTank(bullet, MyTank.getInstance());
                 }
             }
         }
@@ -139,9 +141,9 @@ public class Bullet implements Runnable {
      */
     public void HitMonster() {
         // 判断是否击中了怪物
-        for (int i = 0; i < GamePanel.myTank.bullets.size(); i++) {
+        for (int i = 0; i < MyTank.getInstance().bullets.size(); i++) {
             // 取出子弹
-            Bullet bullet = GamePanel.myTank.bullets.get(i);
+            Bullet bullet = MyTank.getInstance().bullets.get(i);
             if (bullet.isLive) {
                 // 取出每只怪物，进行匹配
                 for (int j = 0; j < Monster.getInstance().getMonsterSize(); j++) {

@@ -1,3 +1,5 @@
+package Hero;
+
 import UIElement.CommonWall;
 import Util.CommonUtil;
 import Util.Direction;
@@ -54,8 +56,8 @@ public class Recorder {
             bw = new BufferedWriter(fw);
 
             // 保存我的坦克的坐标和方向
-            if (GamePanel.myTank.isLive) {
-                backupData(GamePanel.myTank);
+            if (MyTank.getInstance().isLive) {
+                backupData(MyTank.getInstance());
             }
         } catch (Exception e) {
             // 将错误输出
@@ -195,9 +197,9 @@ public class Recorder {
                     tempD = Integer.parseInt(RecoveryInfo[3]);
 
                     // 恢复并进行初始化
-                    GamePanel.myTank = new MyTank(tempX, tempY);
-                    GamePanel.myTank.direct = getDirection(tempD);
-                    GamePanel.myTank.isLive = true;
+                    MyTank.setInstance(new MyTank(tempX, tempY));
+                    MyTank.getInstance().direct = getDirection(tempD);
+                    MyTank.getInstance().isLive = true;
 
                     // 子弹的数据
                     int num = (RecoveryInfo.length - 1) / 3 - 1;
@@ -214,7 +216,7 @@ public class Recorder {
 
                                 // 恢复并进行初始化
                                 bullet = new Bullet(tempX, tempY, getDirection(tempD));
-                                GamePanel.myTank.bullets.add(bullet);
+                                MyTank.getInstance().bullets.add(bullet);
                                 CommonUtil.getInstance().startCachedThread(bullet);
                             }
                         }

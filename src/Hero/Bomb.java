@@ -1,9 +1,11 @@
+package Hero;
+
 import java.awt.*;
 import java.util.Vector;
 
 import static Util.CommonUtil.size;
 
-class Bomb {
+public class Bomb {
     private static final Vector<Bomb> bombs = new Vector<>();
     private static int step = 0;
     // 爆炸效果图片初始化

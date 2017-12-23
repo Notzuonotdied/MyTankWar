@@ -1,3 +1,5 @@
+package Hero;
+
 import UIElement.BlockWall;
 import Util.Audio;
 import Util.CommonUtil;
@@ -13,9 +15,8 @@ import static Util.CommonUtil.*;
  * 主类-坦克类
  */
 public abstract class TankMember {
-
     // 初始化坦克图片
-    private static Image[] tankImages;
+    private static Image[] tankImages;// 定义我的坦克可以连发的子弹数
 
     static {
         tankImages = new Image[]{
@@ -71,7 +72,7 @@ public abstract class TankMember {
 
     // 开火的能力
     public void ShotEnemy() {
-        if (GamePanel.myTank.isLive) {
+        if (MyTank.getInstance().isLive) {
             // 启动声音
             new Audio("Shot.wav").start();
         }
@@ -190,22 +191,22 @@ public abstract class TankMember {
 
     /**
      * 判断是否与普通墙相撞
-     * */
+     */
     public abstract boolean isTouchCWall();
 
     /**
      * 判断是否与石墙相撞
-     * */
+     */
     public abstract boolean isTouchBWall();
 
     /**
      * 判断是否接触
-     * */
+     */
     public abstract boolean isTouchOtherTank();
 
     /**
      * 调用Rectangle函数
-     * */
+     */
     public Rectangle getRect() {
         return new Rectangle(this.x, this.y, size, size);
     }

@@ -1,3 +1,5 @@
+package Hero;
+
 public class TankInfomation {
     int x = 0;
     int y = 0;

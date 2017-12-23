@@ -1,7 +1,10 @@
+import Hero.Bomb;
+import Hero.Monster;
+import Hero.MyTank;
+import Hero.Recorder;
 import UIElement.BlockWall;
 import UIElement.CommonWall;
 import UIElement.Tree;
-import Util.Direction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,22 +18,17 @@ import static Util.CommonUtil.screenWidth;
 @SuppressWarnings("serial")
 // 游戏面板
 public class GamePanel extends JPanel implements KeyListener, Runnable {
-    // 定义我的坦克可以连发的子弹数
-    private static final int buttleNumber = 2;
     // 设置关卡
     public static int level = 0;
     // 控制界面是否移除的变量
     public static boolean button = false;
     public static boolean buttonWin = false;
     public static boolean buttonFail = false;
-    // 定义我的坦克类
-    public static MyTank myTank = null;
 
     // 总成绩
     private static int score = 0;
     // 控制是否在我的坦克死亡后继续游戏的变量
     private static boolean choice = false;
-
 
     /**
      * GamePanel构造函数
@@ -59,12 +57,8 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             if (size != 0 && flag == 1) {
                 // 恢复数据
                 recorder.ReInfo();
-
             } else {
-                // 创建我的坦克,设置坦克的位置
-                myTank = new MyTank(600, 500);
-                myTank.setDirect(Direction.UP);
-                Monster.getInstance().restoreMonsters();
+                MyTank.getInstance().createMyTank();
             }
         } catch (Exception e) {
 
@@ -82,7 +76,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         g.drawImage(Background, 35, -160, screenWidth, screenWidth + 80, null);
 
         // 画出我的坦克
-        DrawMyTank(g);
+        MyTank.getInstance().drawMyTank(g);
         // 画出敌人坦克
         DrawMonster(g);
         // 画出墙,爆炸效果，树木，普通墙
@@ -91,37 +85,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         DrawInfo(g);
     }
 
-    // 画出我的坦克
-    private void DrawMyTank(Graphics g) {
-        // 画出我自己的坦克
-        if (myTank.isLive) {
-            myTank.drawTank(myTank.x, myTank.y, g, 0);
-            this.repaint();
-        }
-
-        // 画出子弹
-        for (int i = 0; i < myTank.bullets.size(); i++) {
-            Bullet bullet = myTank.bullets.get(i);
-            if (bullet != null && bullet.isLive && myTank.isLive
-                    && bullet.BulletComeAcrossCWall(bullet)
-                    && !bullet.BulletComeAcrossMonster(bullet)
-                    && bullet.BulletComeAcrossBWall(bullet, myTank.getBlockWall())) {
-                // 画出子弹的轨迹
-                bullet.drawBullet(g);
-                // 判断是否集中了怪物
-                bullet.HitMonster();
-            }
-            assert bullet != null;
-            if (!bullet.isLive) {
-                // 如果子弹存在状态为假就移除子弹
-                myTank.bullets.remove(bullet);
-            }
-        }
-    }
-
     // 画出怪物
     private void DrawMonster(Graphics g) {
-        score = Monster.getInstance().drawAllMonster(this, g, score);
+        score = Monster.getInstance().drawAllMonster(g, score);
     }
 
     /**
@@ -155,7 +121,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         g.drawString("" + GamePanel.score, 640, 23);
 
         // 提示信息
-        if (Monster.getInstance().getMonsterSize() == 0 && myTank.isLive) {
+        if (Monster.getInstance().getMonsterSize() == 0 && MyTank.getInstance().isLive) {
             Font f = g.getFont();
             // 判断是否赢得比赛--赢了
             g.setFont(new Font("TimesRoman", Font.BOLD, 60));
@@ -167,7 +133,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 g.drawString("You are Crazy！ ", 175, 370);
             }
         }
-        if (!myTank.isLive) {
+        if (!MyTank.getInstance().isLive) {
             Font f = g.getFont();
             // 判断是否赢得比赛--输了
             g.setFont(new Font("TimesRoman", Font.BOLD, 60));
@@ -184,31 +150,8 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     }
 
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            myTank.setDirect(Direction.DOWN);
-            this.repaint();
-            myTank.move();
-        } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-            // 设置我的坦克的方向
-            myTank.setDirect(Direction.UP);
-            this.repaint();
-            myTank.move();
-        } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            myTank.setDirect(Direction.LEFT);
-            this.repaint();
-            myTank.move();
-        } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            myTank.setDirect(Direction.RIGHT);
-            this.repaint();
-            myTank.move();
-        }
-
-        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            if (myTank.bullets.size() < buttleNumber) {
-                myTank.ShotEnemy();
-            }
-        }
-        // 必须调用this.repain()函数，来重新绘制界面
+        MyTank.getInstance().keyPressed(e);
+        // 必须调用this.repaint()函数，来重新绘制界面
         this.repaint();
     }
 

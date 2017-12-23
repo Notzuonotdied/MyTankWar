@@ -1,3 +1,5 @@
+import Hero.Monster;
+import Hero.Recorder;
 import UIElement.CommonWall;
 import Util.Audio;
 import Util.CommonUtil;

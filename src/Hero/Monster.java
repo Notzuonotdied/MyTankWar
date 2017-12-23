@@ -1,9 +1,13 @@
+package Hero;
+
 import UIElement.BlockWall;
 import UIElement.CommonWall;
 import Util.CommonUtil;
 import Util.Direction;
 
 import java.awt.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
 
@@ -18,15 +22,15 @@ public class Monster extends TankMember implements Runnable {
     // 定义怪物的停顿时间
     private static final int WaitingTime = 23;
     // 定义让坦克随机产生一个随机的新的方向的等待时间
-    private static final int WaitingForRandom = 26;
+    private static final int WaitingForRandom = 30;
+    // 定义怪物连发子弹的数量
+    public static int bulletOneTime = 2;
     // 定义怪物的数量
     public static int monsterSize = 6;
     // 定义坦克的生命值
     public static int blood = 50;
-    // 定义怪物连发子弹的数量
-    static int bulletOneTime = 2;
     // 定义一个敌人的坦克集合
-    private static Vector<Monster> monsters = new Vector<>();
+    private static ArrayList<Monster> monsters = new ArrayList<>();
     // 定义随机变量
     private static Random r = new Random();
     private static Monster monster;
@@ -92,12 +96,11 @@ public class Monster extends TankMember implements Runnable {
         }
     }
 
-    public int drawAllMonster(GamePanel gamePanel, Graphics g, int score) {
+    public int drawAllMonster(Graphics g, int score) {
         for (int i = 0; i < monsters.size(); i++) {
             Monster mon = monsters.get(i);
             if (mon.isLive) {
                 mon.drawTank(mon.getX(), mon.getY(), g, 1);
-                gamePanel.repaint();
                 for (int j = 0; j < mon.bullets.size(); j++) {
                     // 取出一个子弹
                     Bullet bullet = mon.bullets.get(j);
@@ -155,7 +158,7 @@ public class Monster extends TankMember implements Runnable {
                 if (mon.getRect().intersects(this.getRect())) {
                     return true;
                 }
-                if (mon.getRect().intersects(GamePanel.myTank.getRect())) {
+                if (mon.getRect().intersects(MyTank.getInstance().getRect())) {
                     return true;
                 }
             }
