@@ -17,8 +17,8 @@ import static Util.CommonUtil.*;
 class GameStartPanel extends JPanel implements KeyListener {
 
     // 返回值
-    public static boolean button0 = false;
-    public static boolean button1 = false;
+    public static boolean continueBtn = false;
+    public static boolean startGameBtn = false;
     private Selection flag = Selection.StartNewGame;
     // 初始化图片坦克的图片
     private Image[] tankImages = new Image[]{
@@ -38,7 +38,6 @@ class GameStartPanel extends JPanel implements KeyListener {
      */
     public void paint(Graphics g) {
         super.paint(g);
-        // 画出信息代码部分
         DrawInfo(g);
     }
 
@@ -48,10 +47,8 @@ class GameStartPanel extends JPanel implements KeyListener {
      * @param g 画笔
      */
     private void DrawInfo(Graphics g) {
-
         g.fillRect(0, 0, screenWidth + 10, screenHeight);
         // 提示信息
-
         g.setColor(Color.YELLOW);
         // 开关信息的字体
         Font myFont1 = new Font("楷体", Font.BOLD, 60);
@@ -61,15 +58,14 @@ class GameStartPanel extends JPanel implements KeyListener {
         g.drawString("坦克大战-无聊版", 176, 315);
 
         g.setColor(Color.GRAY);
-        Font myfont = new Font("楷体", Font.BOLD, 30);
-        g.setFont(myfont);
+        Font myFont = new Font("楷体", Font.BOLD, 30);
+        g.setFont(myFont);
 
         g.drawString("开始游戏", InfoX, InfoY);
         g.drawString("继续游戏", InfoX, InfoY + 40);
         // 画出坦克
         g.drawImage(tankImages[getSelectionIndex(flag)], this.x, this.y, null);
         this.repaint();
-
     }
 
     private int getSelectionIndex(Selection selection) {
@@ -105,9 +101,9 @@ class GameStartPanel extends JPanel implements KeyListener {
             case KeyEvent.VK_ENTER:
             case KeyEvent.VK_SPACE:
                 if (this.flag == Selection.StartNewGame) {
-                    GameStartPanel.button0 = true;
+                    GameStartPanel.continueBtn = true;
                 } else {
-                    GameStartPanel.button1 = true;
+                    GameStartPanel.startGameBtn = true;
                 }
                 // 启动声音
                 new Audio("bgm.wav").start();

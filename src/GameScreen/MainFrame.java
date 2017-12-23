@@ -21,7 +21,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private GameStartPanel gamestartpanel;
 
     // 构造函数
-    MainFrame() {
+    public MainFrame() {
         // 菜单条
         MenuBar mb = new MenuBar();
         String[] menuString = new String[]{"游戏开始", "游戏说明", "游戏帮助", "游戏作者"};
@@ -92,8 +92,7 @@ public class MainFrame extends JFrame implements ActionListener {
         gamestartpanel = new GameStartPanel();
         gamestartpanel.setBackground(Color.BLACK);
 
-        this.add(gamestartpanel);
-        this.addKeyListener(gamestartpanel);
+        resetGamePanel(GameStatus.ShowStartScreen);
 
         // 界面的设置
         this.setIconImage((new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
@@ -163,16 +162,11 @@ public class MainFrame extends JFrame implements ActionListener {
                 setGameLevel(0);
 
                 gamepanel.setBackground(Color.BLACK);
-                GamePanel.button = true;
+                GamePanel.continueBtn = true;
                 CommonUtil.getInstance().startSingleThread(gamepanel);
                 // 启动声音
                 new Audio("bgm.wav").start();
-                // 删除旧的面板
-                this.remove(gamestartpanel);
-                this.removeKeyListener(gamestartpanel);
-                this.add(gamepanel);
-                // 监听
-                this.addKeyListener(gamepanel);
+                resetGamePanel(GameStatus.StartGame);
                 this.setVisible(true);
                 break;
             }
@@ -227,10 +221,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
                 break;
             case "continue": {
-                // 删除旧的面板
-                this.remove(gamestartpanel);
-                this.removeKeyListener(gamestartpanel);
-                if (GamePanel.button) {
+                if (GamePanel.continueBtn) {
                     Object[] options = {"恢复游戏", "继续游戏"};
                     int response = showChoiceStyleDialog(options,
                             "恢复保存的游戏并放弃本次游戏？");
@@ -245,8 +236,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 CommonUtil.getInstance().startSingleThread(gamepanel);
                 // 初始化界面
                 this.gamepanel = new GamePanel(1);
-                this.add(gamepanel);
-                this.addKeyListener(gamepanel);
+                resetGamePanel(GameStatus.StartGame);
                 this.setVisible(true);
                 break;
             }
@@ -325,32 +315,28 @@ public class MainFrame extends JFrame implements ActionListener {
         if (!this.button) {
             try {
                 // 开始游戏
-                if (GameStartPanel.button1) {
+                if (GameStartPanel.startGameBtn) {
                     Monster.getInstance().clearMonsters();
                     // 设置游戏的段位
                     setGameLevel(0);
 
                     gamepanel.setBackground(Color.BLACK);
-                    GamePanel.button = true;
+                    GamePanel.continueBtn = true;
 
                     CommonUtil.getInstance().startSingleThread(gamepanel);
 
                     // 启动声音
                     new Audio("bgm.wav").start();
-                    // 删除旧的面板
-                    this.remove(gamestartpanel);
-                    this.removeKeyListener(gamestartpanel);
-                    this.add(gamepanel);
-                    this.addKeyListener(gamepanel);
+                    resetGamePanel(GameStatus.StartGame);
                     this.setVisible(true);
                     this.button = true;
                 }
                 // 继续游戏
-                if (GameStartPanel.button0) {
+                if (GameStartPanel.continueBtn) {
                     // 删除旧的面板
                     this.remove(gamestartpanel);
                     this.removeKeyListener(gamestartpanel);
-                    if (GamePanel.button) {
+                    if (GamePanel.continueBtn) {
                         Object[] options = {"恢复游戏", "继续游戏"};
                         int response = showChoiceStyleDialog(options,
                                 "恢复保存的游戏并放弃本次游戏?");
@@ -362,7 +348,6 @@ public class MainFrame extends JFrame implements ActionListener {
                     }
                     // 初始化界面
                     gamepanel = new GamePanel(1);
-
                     // 启动线程
                     CommonUtil.getInstance().startSingleThread(gamepanel);
                     this.add(gamepanel);
@@ -451,14 +436,18 @@ public class MainFrame extends JFrame implements ActionListener {
     private void resetGamePanel(GameStatus gameStatus) {
         switch (gameStatus) {
             case StartGame:
-                this.remove(gamestartpanel);
-                this.removeKeyListener(gamestartpanel);
+                if (gamestartpanel != null) {
+                    this.remove(gamestartpanel);
+                    this.removeKeyListener(gamestartpanel);
+                }
                 this.add(gamepanel);
                 this.addKeyListener(gamepanel);
                 break;
             case ShowStartScreen:
-                this.remove(gamepanel);
-                this.removeKeyListener(gamepanel);
+                if (gamepanel != null) {
+                    this.remove(gamepanel);
+                    this.removeKeyListener(gamepanel);
+                }
                 this.add(gamestartpanel);
                 this.addKeyListener(gamestartpanel);
                 break;

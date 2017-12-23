@@ -23,7 +23,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     // 设置关卡
     public static int level = 0;
     // 控制界面是否移除的变量
-    public static boolean button = false;
+    public static boolean continueBtn = false;
     public static boolean buttonWin = false;
     public static boolean buttonFail = false;
 
