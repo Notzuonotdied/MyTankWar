@@ -55,20 +55,9 @@ public class MyTank extends TankMember {
 
         // 画出子弹
         for (int i = 0; i < myTank.bullets.size(); i++) {
-            Bullet bullet = myTank.bullets.get(i);
-            if (bullet != null && bullet.isLive && myTank.isLive
-                    && bullet.BulletComeAcrossCWall(bullet)
-                    && !bullet.BulletComeAcrossMonster(bullet)
-                    && bullet.BulletComeAcrossBWall(bullet, myTank.getBlockWall())) {
-                // 画出子弹的轨迹
-                bullet.drawBullet(g);
-                // 判断是否集中了怪物
-                bullet.HitMonster();
-            }
-            assert bullet != null;
-            if (!bullet.isLive) {
+            if (!Bullet.getInstance().ifDrawBullet(myTank, g)) {
                 // 如果子弹存在状态为假就移除子弹
-                myTank.bullets.remove(bullet);
+                myTank.bullets.remove(myTank.bullets.get(i));
             }
         }
     }
@@ -78,7 +67,6 @@ public class MyTank extends TankMember {
             myTank.setDirect(Direction.DOWN);
             myTank.move();
         } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-            // 设置我的坦克的方向
             myTank.setDirect(Direction.UP);
             myTank.move();
         } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
@@ -96,8 +84,10 @@ public class MyTank extends TankMember {
         }
     }
 
+    /**
+     * 创建我的坦克,并恢复所有的Monster
+     * */
     public void createMyTank() {
-        // 创建我的坦克,设置坦克的位置
         myTank = new MyTank(600, 500);
         myTank.setDirect(Direction.UP);
         Monster.getInstance().restoreMonsters();

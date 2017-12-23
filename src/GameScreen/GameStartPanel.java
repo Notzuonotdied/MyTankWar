@@ -1,3 +1,5 @@
+package GameScreen;
+
 import Hero.TankMember;
 import Util.Audio;
 
@@ -17,8 +19,7 @@ class GameStartPanel extends JPanel implements KeyListener {
     // 返回值
     public static boolean button0 = false;
     public static boolean button1 = false;
-    // 图片类
-    private int flag = 1;
+    private Selection flag = Selection.StartNewGame;
     // 初始化图片坦克的图片
     private Image[] tankImages = new Image[]{
             Toolkit.getDefaultToolkit().getImage(
@@ -32,13 +33,20 @@ class GameStartPanel extends JPanel implements KeyListener {
     private int x = InfoX - size / 2 * 3 - 8;
     private int y = InfoY - 30;
 
+    /**
+     * 绘制主界面的文字信息
+     */
     public void paint(Graphics g) {
         super.paint(g);
         // 画出信息代码部分
         DrawInfo(g);
     }
 
-    // 画出信息
+    /**
+     * 画出信息
+     *
+     * @param g 画笔
+     */
     private void DrawInfo(Graphics g) {
 
         g.fillRect(0, 0, screenWidth + 10, screenHeight);
@@ -46,8 +54,8 @@ class GameStartPanel extends JPanel implements KeyListener {
 
         g.setColor(Color.YELLOW);
         // 开关信息的字体
-        Font myfont1 = new Font("楷体", Font.BOLD, 60);
-        g.setFont(myfont1);
+        Font myFont1 = new Font("楷体", Font.BOLD, 60);
+        g.setFont(myFont1);
         g.drawString("坦克大战-无聊版", 180, 310);
         g.setColor(Color.RED);
         g.drawString("坦克大战-无聊版", 176, 315);
@@ -59,9 +67,20 @@ class GameStartPanel extends JPanel implements KeyListener {
         g.drawString("开始游戏", InfoX, InfoY);
         g.drawString("继续游戏", InfoX, InfoY + 40);
         // 画出坦克
-        g.drawImage(tankImages[this.flag], this.x, this.y, null);
+        g.drawImage(tankImages[getSelectionIndex(flag)], this.x, this.y, null);
         this.repaint();
 
+    }
+
+    private int getSelectionIndex(Selection selection) {
+        switch (selection) {
+            case StartNewGame:
+                return 1;
+            case Continue:
+                return 0;
+            default:
+                return 1;
+        }
     }
 
     public void keyTyped(KeyEvent e) {
@@ -72,20 +91,20 @@ class GameStartPanel extends JPanel implements KeyListener {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_DOWN:
             case KeyEvent.VK_UP:
-                if (flag == 1) {
+                if (flag == Selection.StartNewGame) {
                     this.x = InfoX - size / 2 * 3;
                     this.y = InfoY + 15;
-                    this.flag = 0;
+                    this.flag = Selection.Continue;
                 } else {
                     this.x = InfoX - size / 2 * 3 - 8;
                     this.y = InfoY - 30;
-                    this.flag = 1;
+                    this.flag = Selection.StartNewGame;
                 }
                 this.repaint();
                 break;
             case KeyEvent.VK_ENTER:
             case KeyEvent.VK_SPACE:
-                if (this.flag == 0) {
+                if (this.flag == Selection.StartNewGame) {
                     GameStartPanel.button0 = true;
                 } else {
                     GameStartPanel.button1 = true;

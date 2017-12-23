@@ -23,6 +23,7 @@ public class Bullet implements Runnable {
     // 子弹图片初始化
     // 定义为全局静态变量
     private static Image[] BulletImages;
+    private static Bullet bullet;
 
     static {
         BulletImages = new Image[]{
@@ -45,11 +46,26 @@ public class Bullet implements Runnable {
     // 定义方向
     Direction direct;
 
+    private Bullet() {
+
+    }
+
     // 构造函数
-    public Bullet(int x, int y, Direction direct) {
+    Bullet(int x, int y, Direction direct) {
         this.x = x;
         this.y = y;
         this.direct = direct;
+    }
+
+    public static Bullet getInstance() {
+        if (bullet == null) {
+            synchronized (Bullet.class) {
+                if (bullet == null) {
+                    bullet = new Bullet();
+                }
+            }
+        }
+        return bullet;
     }
 
     // 画出子弹
@@ -70,10 +86,14 @@ public class Bullet implements Runnable {
         }
     }
 
+    boolean isBulletReady(TankMember tankMember) {
+        return isLive && BulletComeAcrossCWall(this) && BulletComeAcrossBWall(this, tankMember.getBlockWall());
+    }
+
     /**
      * 判断怪物和我的子弹与普通墙相遇的时候--击中普通墙，则普通墙消失，子弹也消失
      */
-    public boolean BulletComeAcrossCWall(Bullet bullet) {
+    private boolean BulletComeAcrossCWall(Bullet bullet) {
         for (int i = 0; i < CommonWall.getInstance().getCWallsSize(); i++) {
             if (CommonWall.getInstance().getCWallRectAt(i).intersects(bullet.getBulletRect())) {
                 bullet.isLive = false;
@@ -88,7 +108,7 @@ public class Bullet implements Runnable {
     /**
      * 判断怪物和我的子弹与石墙相遇的时候--子弹消失
      */
-    public boolean BulletComeAcrossBWall(Bullet bullet, BlockWall blockWall) {
+    private boolean BulletComeAcrossBWall(Bullet bullet, BlockWall blockWall) {
         for (int i = 0; i < blockWall.getBWalls_1Size(); i++) {
             if (blockWall.getBWallRectAt(i).intersects(bullet.getBulletRect())) {
                 bullet.isLive = false;
@@ -100,21 +120,41 @@ public class Bullet implements Runnable {
 
     /**
      * 判断我的坦克的子弹和怪物的子弹相遇的情况，子弹相遇后抵消，都消失
+     *
+     * @return true->相遇，消失；false->没有遇到，不消失
      */
-    public boolean BulletComeAcrossMonster(Bullet bullet) {
+    private boolean isBulletComeAcross() {
         for (int i = 0; i < Monster.getInstance().getMonsterSize(); i++) {
             Monster mon = Monster.getInstance().getMonsterAt(i);
             for (int j = 0; j < mon.bullets.size(); j++) {
                 Bullet b = mon.bullets.get(j);
-                if (b.getBulletRect().intersects(bullet.getBulletRect())) {
+                if (b.getBulletRect().intersects(getBulletRect())) {
                     // 两者的存在状态都为死亡
-                    bullet.isLive = false;
+                    isLive = false;
                     mon.bullets.remove(b);
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    public boolean ifDrawBullet(TankMember tankMember, Graphics g) {
+        for (int i = 0; i < tankMember.bullets.size(); i++) {
+            Bullet bullet = tankMember.bullets.get(i);
+            if (bullet != null && bullet.isBulletReady(tankMember) && !bullet.isBulletComeAcross()) {
+                // 画出子弹的轨迹
+                bullet.drawBullet(g);
+                // 判断是否集中了怪物
+                bullet.HitMonster();
+            }
+            assert bullet != null;
+            if (!bullet.isLive) {
+                // 如果子弹存在状态为假就移除子弹
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -139,7 +179,7 @@ public class Bullet implements Runnable {
     /**
      * 判断我的坦克的子弹是否击中了怪物
      */
-    public void HitMonster() {
+    private void HitMonster() {
         // 判断是否击中了怪物
         for (int i = 0; i < MyTank.getInstance().bullets.size(); i++) {
             // 取出子弹

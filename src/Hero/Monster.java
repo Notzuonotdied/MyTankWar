@@ -2,12 +2,11 @@ package Hero;
 
 import UIElement.BlockWall;
 import UIElement.CommonWall;
+import Util.Audio;
 import Util.CommonUtil;
 import Util.Direction;
 
 import java.awt.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
 
@@ -23,14 +22,14 @@ public class Monster extends TankMember implements Runnable {
     private static final int WaitingTime = 23;
     // 定义让坦克随机产生一个随机的新的方向的等待时间
     private static final int WaitingForRandom = 30;
+    // 定义一个敌人的坦克集合
+    private static final Vector<Monster> monsters = new Vector<>();
     // 定义怪物连发子弹的数量
     public static int bulletOneTime = 2;
     // 定义怪物的数量
     public static int monsterSize = 6;
     // 定义坦克的生命值
     public static int blood = 50;
-    // 定义一个敌人的坦克集合
-    private static ArrayList<Monster> monsters = new ArrayList<>();
     // 定义随机变量
     private static Random r = new Random();
     private static Monster monster;
@@ -39,7 +38,6 @@ public class Monster extends TankMember implements Runnable {
         super();
     }
 
-    // 调用父类的构造函数进行初始化
     Monster(int x, int y) {
         super(x, y);
     }
@@ -96,6 +94,12 @@ public class Monster extends TankMember implements Runnable {
         }
     }
 
+    /**
+     * 绘制所有的Monster
+     *
+     * @param g     画笔
+     * @param score 分数
+     */
     public int drawAllMonster(Graphics g, int score) {
         for (int i = 0; i < monsters.size(); i++) {
             Monster mon = monsters.get(i);
@@ -104,8 +108,7 @@ public class Monster extends TankMember implements Runnable {
                 for (int j = 0; j < mon.bullets.size(); j++) {
                     // 取出一个子弹
                     Bullet bullet = mon.bullets.get(j);
-                    if (bullet.isLive && bullet.BulletComeAcrossCWall(bullet)
-                            && bullet.BulletComeAcrossBWall(bullet, mon.getBlockWall())) {
+                    if (bullet.isBulletReady(mon)) {
                         // 画出子弹的轨迹
                         bullet.drawBullet(g);
                         // 判断是否击中了我的坦克
@@ -153,13 +156,15 @@ public class Monster extends TankMember implements Runnable {
      */
     @Override
     public boolean isTouchOtherTank() {
-        for (Monster mon : monsters) {
-            if (this != mon) {
-                if (mon.getRect().intersects(this.getRect())) {
-                    return true;
-                }
-                if (mon.getRect().intersects(MyTank.getInstance().getRect())) {
-                    return true;
+        synchronized (monsters) {
+            for (Monster mon : monsters) {
+                if (this != mon) {
+                    if (mon.getRect().intersects(this.getRect())) {
+                        return true;
+                    }
+                    if (mon.getRect().intersects(MyTank.getInstance().getRect())) {
+                        return true;
+                    }
                 }
             }
         }
@@ -172,12 +177,7 @@ public class Monster extends TankMember implements Runnable {
      */
     private void StopSeconds() {
         Direction oldDirect = this.direct;
-        int waitingTime = r.nextInt(6);
-        try {
-            Thread.sleep(waitingTime);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sleepForMoment(r.nextInt(12) + 1);
         direct = oldDirect;
     }
 
@@ -190,8 +190,7 @@ public class Monster extends TankMember implements Runnable {
             }
             for (int i = 0; i < getRandomMoveStep(); i++) {
                 // 判断坦克是否遇到障碍物，遇到就停止
-                if (!isTouchOtherTank() && !isTouchBWall()
-                        && !isTouchCWall() && !isTouchBorder()) {
+                if (canMove()) {
                     this.move();
                     // 判断坦克行走后是否遇到障碍物，遇到就停止并还原移动
                     if (afterMoveIsOkay()) {
@@ -200,11 +199,7 @@ public class Monster extends TankMember implements Runnable {
                 } else {
                     break;
                 }
-                try {
-                    Thread.sleep(WaitingTime);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                sleepForMoment(WaitingTime);
             }
             // 添加子弹
             AddBullets();
@@ -229,10 +224,10 @@ public class Monster extends TankMember implements Runnable {
         // 判断是否需要给坦克加入新的子弹
         if (isLive) {
             if (bullets.size() < bulletOneTime) {
-//                if (GamePanel.myTank.isLive && bullets.size() > 2) {
-//                    // 启动声音
-//                    new Audio("Shot.wav").start();
-//                }
+                if (MyTank.getInstance().isLive && bullets.size() > bulletOneTime) {
+                    // 启动声音
+                    new Audio("Shot.wav").start();
+                }
                 // 没有子弹，添加
                 Bullet bullet = null;
                 switch (direct) {
@@ -259,9 +254,11 @@ public class Monster extends TankMember implements Runnable {
     @Override
     public boolean isTouchCWall() {
         for (int i = 0; i < CommonWall.getInstance().getCWallsSize(); i++) {
-            for (Monster mon : monsters) {
-                if (CommonWall.getInstance().getCWallRectAt(i).intersects(mon.getRect())) {
-                    return true;
+            synchronized (monsters) {
+                for (Monster mon : monsters) {
+                    if (CommonWall.getInstance().getCWallRectAt(i).intersects(mon.getRect())) {
+                        return true;
+                    }
                 }
             }
         }
@@ -271,9 +268,11 @@ public class Monster extends TankMember implements Runnable {
     @Override
     public boolean isTouchBWall() {
         for (int i = 0; i < BlockWall.getInstance().getBWalls_1Size(); i++) {
-            for (Monster mon : monsters) {
-                if (BlockWall.getInstance().getBWallRectAt(i).intersects(mon.getRect())) {
-                    return true;
+            synchronized (monsters) {
+                for (Monster mon : monsters) {
+                    if (BlockWall.getInstance().getBWallRectAt(i).intersects(mon.getRect())) {
+                        return true;
+                    }
                 }
             }
         }

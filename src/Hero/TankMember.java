@@ -16,7 +16,7 @@ import static Util.CommonUtil.*;
  */
 public abstract class TankMember {
     // 初始化坦克图片
-    private static Image[] tankImages;// 定义我的坦克可以连发的子弹数
+    private static Image[] tankImages;
 
     static {
         tankImages = new Image[]{
@@ -152,7 +152,7 @@ public abstract class TankMember {
         return direct;
     }
 
-    protected Direction getRandomDirection() {
+    Direction getRandomDirection() {
         switch (random.nextInt(3)) {
             case 0:
                 return Direction.UP;
@@ -168,7 +168,7 @@ public abstract class TankMember {
     }
 
     // 判断是否越界
-    boolean isTouchBorder() {
+    private boolean isTouchBorder() {
         if (x < BlockWall.BlockWallWidth) {
             x = BlockWall.BlockWallWidth;
             return true;
@@ -187,7 +187,6 @@ public abstract class TankMember {
         }
         return false;
     }
-
 
     /**
      * 判断是否与普通墙相撞
@@ -214,7 +213,7 @@ public abstract class TankMember {
     /**
      * 保存旧的位置,保证出现错误的移动可以恢复到原先的位置
      */
-    protected void set2OldDirect() {
+    void set2OldDirect() {
         this.oldX = x;
         this.oldY = y;
     }
@@ -227,11 +226,11 @@ public abstract class TankMember {
         y = oldY;
     }
 
-    protected boolean canMove() {
+    boolean canMove() {
         return !isTouchOtherTank() && !isTouchBorder() && !isTouchCWall() && !isTouchBWall();
     }
 
-    protected boolean afterMoveIsOkay() {
+    boolean afterMoveIsOkay() {
         if (isTouchOtherTank() || isTouchBorder() || isTouchCWall() || isTouchBWall()) {
             chang2OldDirect();
             return true;
@@ -263,4 +262,11 @@ public abstract class TankMember {
         return bullets;
     }
 
+    void sleepForMoment(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

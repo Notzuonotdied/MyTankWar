@@ -1,3 +1,5 @@
+package GameScreen;
+
 import Hero.Monster;
 import Hero.Recorder;
 import UIElement.CommonWall;
@@ -9,10 +11,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
-
-enum GameStatus {
-    StartGame, ShowStartScreen
-}
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements ActionListener {
