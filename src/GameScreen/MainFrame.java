@@ -1,7 +1,7 @@
 package GameScreen;
 
-import Hero.Monster;
-import Hero.Recorder;
+import Tank.Monster;
+import Tank.Recorder;
 import UIElement.CommonWall;
 import Util.Audio;
 import Util.CommonUtil;
@@ -22,6 +22,18 @@ public class MainFrame extends JFrame implements ActionListener {
 
     // 构造函数
     public MainFrame() {
+        setMenuBarAttr();
+        // 实例化开始面板
+        gamestartpanel = new GameStartPanel();
+        gamestartpanel.setBackground(Color.BLACK);
+        resetGamePanel(GameStatus.ShowStartScreen);
+        setMainFrameAttr();
+    }
+
+    /**
+     * 设置MenuBar的属性
+     */
+    private void setMenuBarAttr() {
         // 菜单条
         MenuBar mb = new MenuBar();
         String[] menuString = new String[]{"游戏开始", "游戏说明", "游戏帮助", "游戏作者"};
@@ -52,8 +64,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
         // 游戏说明的子菜单
         String[] childMenuString2 = new String[]{
-                "游戏开发说明", "开始游戏说明", "继续游戏说明",
-                "级别  1", "级别  2", "级别  3"
+                "游戏开发说明", "开始游戏说明", "继续游戏说明", "级别  1", "级别  2", "级别  3"
         };
 
         String[] childMenuCommand2 = new String[]{
@@ -87,13 +98,12 @@ public class MainFrame extends JFrame implements ActionListener {
 
         // 添加到菜单条上
         this.setMenuBar(mb);
+    }
 
-        // 实例化开始面板
-        gamestartpanel = new GameStartPanel();
-        gamestartpanel.setBackground(Color.BLACK);
-
-        resetGamePanel(GameStatus.ShowStartScreen);
-
+    /**
+     * 设置MainFrame的属性
+     */
+    private void setMainFrameAttr() {
         // 界面的设置
         this.setIconImage((new ImageIcon(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("images/wangyu.jpg")))).getImage());

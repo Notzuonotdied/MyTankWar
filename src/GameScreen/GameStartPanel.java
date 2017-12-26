@@ -1,6 +1,6 @@
 package GameScreen;
 
-import Hero.TankMember;
+import Tank.TankMember;
 import Util.Audio;
 
 import javax.swing.*;

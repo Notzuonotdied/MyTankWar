@@ -1,9 +1,9 @@
 package GameScreen;
 
-import Hero.Bomb;
-import Hero.Monster;
-import Hero.MyTank;
-import Hero.Recorder;
+import Tank.Bomb;
+import Tank.Monster;
+import Tank.MyTank;
+import Tank.Recorder;
 import UIElement.BlockWall;
 import UIElement.CommonWall;
 import UIElement.Tree;

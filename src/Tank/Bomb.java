@@ -1,4 +1,4 @@
-package Hero;
+package Tank;
 
 import java.awt.*;
 import java.util.Vector;
