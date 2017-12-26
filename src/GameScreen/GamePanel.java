@@ -35,7 +35,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     /**
      * GamePanel构造函数
      */
-    GamePanel(int flag) {
+    GamePanel(GamePanelStatus flag) {
         int size = 0;
         Recorder recorder = new Recorder();
         // 判断记录的文本是否为空
@@ -56,9 +56,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 }
             }
 
-            if (size != 0 && flag == 1) {
+            if (size != 0 && flag == GamePanelStatus.Continue) {
                 // 恢复数据
-                recorder.ReInfo();
+                recorder.Restore();
             } else {
                 MyTank.getInstance().createMyTank();
             }

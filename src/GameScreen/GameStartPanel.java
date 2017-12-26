@@ -91,19 +91,25 @@ class GameStartPanel extends JPanel implements KeyListener {
                     this.x = InfoX - size / 2 * 3;
                     this.y = InfoY + 15;
                     this.flag = Selection.Continue;
+                    System.out.println("继续游戏");
                 } else {
                     this.x = InfoX - size / 2 * 3 - 8;
                     this.y = InfoY - 30;
                     this.flag = Selection.StartNewGame;
+                    System.out.println("开始新游戏");
                 }
                 this.repaint();
                 break;
             case KeyEvent.VK_ENTER:
             case KeyEvent.VK_SPACE:
                 if (this.flag == Selection.StartNewGame) {
-                    GameStartPanel.continueBtn = true;
-                } else {
+                    GameStartPanel.continueBtn = false;
                     GameStartPanel.startGameBtn = true;
+                    System.out.println("开始新游戏");
+                } else {
+                    GameStartPanel.startGameBtn = false;
+                    GameStartPanel.continueBtn = true;
+                    System.out.println("继续游戏");
                 }
                 // 启动声音
                 new Audio("bgm.wav").start();

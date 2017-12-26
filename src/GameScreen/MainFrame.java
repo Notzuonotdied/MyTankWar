@@ -15,7 +15,7 @@ import java.util.Objects;
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements ActionListener {
 
-    private boolean button = false;
+    private boolean ifStart = false;
     // 定义组件
     private GamePanel gamepanel = null;
     private GameStartPanel gamestartpanel;
@@ -202,10 +202,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 int response = showChoiceStyleDialog(options, "存盘并退出游戏？");
                 if (response == 0) {
                     // 保存我的坦克的信息和怪物的信息
-                    Recorder rc = new Recorder();
-                    rc.SaveMonsterInfo();
-                    rc.SaveMyTankInfo();
-
+                    new Recorder().save();
                     // 正常退出程序
                     System.exit(0);
                 }
@@ -213,12 +210,7 @@ public class MainFrame extends JFrame implements ActionListener {
             }
             case "save":
                 // 保存我的坦克的信息和怪物的信息
-                Recorder rc = new Recorder();
-                // 开始保存
-                rc.SaveMonsterInfo();
-                rc.SaveMyTankInfo();
-                rc.SaveCWallInfo();
-
+                CommonUtil.getInstance().startSingleThread(new Recorder());
                 break;
             case "continue": {
                 if (GamePanel.continueBtn) {
@@ -232,11 +224,11 @@ public class MainFrame extends JFrame implements ActionListener {
                     }
                 }
 
+                // 初始化界面
+                this.gamepanel = new GamePanel(GamePanelStatus.Continue);
+                resetGamePanel(GameStatus.StartGame);
                 // 启动线程
                 CommonUtil.getInstance().startSingleThread(gamepanel);
-                // 初始化界面
-                this.gamepanel = new GamePanel(1);
-                resetGamePanel(GameStatus.StartGame);
                 this.setVisible(true);
                 break;
             }
@@ -286,6 +278,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     private void start() {
+        // 判断游戏的输赢
         if (GamePanel.buttonWin || GamePanel.buttonFail) {
             if (GamePanel.buttonWin) {
                 Object[] options = {"确定", "取消"};
@@ -312,7 +305,7 @@ public class MainFrame extends JFrame implements ActionListener {
             }
         }
 
-        if (!this.button) {
+        if (!this.ifStart) {
             try {
                 // 开始游戏
                 if (GameStartPanel.startGameBtn) {
@@ -329,7 +322,7 @@ public class MainFrame extends JFrame implements ActionListener {
                     new Audio("bgm.wav").start();
                     resetGamePanel(GameStatus.StartGame);
                     this.setVisible(true);
-                    this.button = true;
+                    this.ifStart = true;
                 }
                 // 继续游戏
                 if (GameStartPanel.continueBtn) {
@@ -347,14 +340,13 @@ public class MainFrame extends JFrame implements ActionListener {
                         }
                     }
                     // 初始化界面
-                    gamepanel = new GamePanel(1);
+                    gamepanel = new GamePanel(GamePanelStatus.Continue);
                     // 启动线程
                     CommonUtil.getInstance().startSingleThread(gamepanel);
                     this.add(gamepanel);
                     this.addKeyListener(gamepanel);
                     this.setVisible(true);
-
-                    this.button = true;
+                    this.ifStart = true;
                 }
 
             } catch (Exception e) {
@@ -392,7 +384,7 @@ public class MainFrame extends JFrame implements ActionListener {
         Monster.monsterSize = monsterSize;
         Monster.bulletOneTime = bulletSize;
         GamePanel.level = level;
-        gamepanel = new GamePanel(0);
+        gamepanel = new GamePanel(GamePanelStatus.StartGame);
     }
 
     private int showChoiceDialog(Object[] options, String message) {
