@@ -21,21 +21,21 @@ public abstract class TankMember {
     static {
         tankImages = new Image[]{
                 Toolkit.getDefaultToolkit().getImage(
-                        TankMember.class.getResource("/images/1.gif")),
+                        TankMember.class.getResource("/images/monsterUp.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        TankMember.class.getResource("/images/2.gif")),
+                        TankMember.class.getResource("/images/monsterRight.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        TankMember.class.getResource("/images/3.gif")),
+                        TankMember.class.getResource("/images/monsterDown.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        TankMember.class.getResource("/images/4.gif")),
+                        TankMember.class.getResource("/images/monsterLeft.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        TankMember.class.getResource("/images/m0.gif")),
+                        TankMember.class.getResource("/images/heroUp.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        TankMember.class.getResource("/images/m1.gif")),
+                        TankMember.class.getResource("/images/heroRight.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        TankMember.class.getResource("/images/m2.gif")),
+                        TankMember.class.getResource("/images/heroDown.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        TankMember.class.getResource("/images/m3.gif")),};
+                        TankMember.class.getResource("/images/heroLeft.gif")),};
     }
 
     // 定义我的坦克的生命状态

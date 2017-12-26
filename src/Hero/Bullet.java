@@ -29,13 +29,13 @@ public class Bullet implements Runnable {
         BulletImages = new Image[]{
                 // 上 左 下 右
                 Toolkit.getDefaultToolkit().getImage(
-                        Bullet.class.getResource("/images/bullet1.gif")),
+                        Bullet.class.getResource("/images/bulletUp.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        Bullet.class.getResource("/images/bullet2.gif")),
+                        Bullet.class.getResource("/images/bulletRight.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        Bullet.class.getResource("/images/bullet3.gif")),
+                        Bullet.class.getResource("/images/bulletDown.gif")),
                 Toolkit.getDefaultToolkit().getImage(
-                        Bullet.class.getResource("/images/bullet4.gif")),};
+                        Bullet.class.getResource("/images/bulletLeft.gif")),};
     }
 
     // 定义坐标

@@ -23,9 +23,9 @@ class GameStartPanel extends JPanel implements KeyListener {
     // 初始化图片坦克的图片
     private Image[] tankImages = new Image[]{
             Toolkit.getDefaultToolkit().getImage(
-                    TankMember.class.getResource("/images/1.gif")),
+                    TankMember.class.getResource("/images/monsterUp.gif")),
             Toolkit.getDefaultToolkit().getImage(
-                    TankMember.class.getResource("/images/m0.gif"))
+                    TankMember.class.getResource("/images/heroUp.gif"))
     };
     // 设置开始游戏继续游戏的位置
     private int InfoX = 320;
